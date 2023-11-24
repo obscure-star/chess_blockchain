@@ -30,7 +30,6 @@ fun startGame(player: String){
                 name = "black",
                 points = 0L
             ),
-            Board()
         )
     } else {
         game = Game(
@@ -42,7 +41,6 @@ fun startGame(player: String){
                 name = "white",
                 points = 0L
             ),
-            Board()
         )
     }
     game.start()

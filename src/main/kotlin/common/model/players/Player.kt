@@ -1,11 +1,14 @@
 package common.model.players
 
 import common.model.Piece
+import common.model.Position
 
 interface Player {
     val name: String
     var points: Long
-    val ownPieces: List<Piece>
-    val wonPieces: List<Piece>
+    val ownPieces: Set<Piece>
+    val wonPieces: Set<Piece>
     fun defaultPieces(): List<List<Piece>>
+    fun setOwnPieces()
+    fun piecePositions(): List<String>
 }

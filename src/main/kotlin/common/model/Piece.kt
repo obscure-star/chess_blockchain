@@ -5,7 +5,11 @@ import common.model.pieceTypes.PieceType
 data class Piece(
     val name: String?,
     val pieceType: PieceType?,
-    val position: Position,
-    val openMoves: List<Position> = emptyList(),
-    val restrictedMoves: List<Position> = emptyList()
-    )
+    var position: Position = Position(1, "a"),
+    var openMoves: Set<Position> = emptySet(),
+    var restrictedMoves: Set<Position> = emptySet()
+    ){
+    fun setOpenMoves(playerPiecePosition: List<String>){
+        openMoves = pieceType?.movePattern(position, playerPiecePositions = playerPiecePosition) ?: emptySet()
+    }
+}

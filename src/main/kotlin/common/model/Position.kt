@@ -5,6 +5,6 @@ data class Position(
     val column: String
 ){
     override fun toString(): String {
-        return "$row$column"
+        return "$column$row"
     }
 }
