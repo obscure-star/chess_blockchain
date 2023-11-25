@@ -1,17 +1,23 @@
-package common.model.pieceTypes
+package chess.common.model.pieceTypes
 
+import chess.common.model.Position
 import chess.toColumn
 import chess.toColumnNumber
-import common.model.Position
 
 data class Rook(
     override val name: String = "rook",
-    override val image: String = " R "
-): PieceType{
-    override fun movePattern(position: Position, playerPiecePositions: List<String>): Set<Position> {
+    override val image: String = " R ",
+) : PieceType {
+    override fun movePattern(
+        position: Position,
+        playerPiecePositions: List<String>,
+    ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
-        fun addIfValid(colOffset: Int, rowOffset: Int) {
+        fun addIfValid(
+            colOffset: Int,
+            rowOffset: Int,
+        ) {
             var col = position.column.toColumnNumber() + colOffset
             var newRow = position.row + rowOffset
 
@@ -42,5 +48,4 @@ data class Rook(
         println("These are the valid positions: $validPositions")
         return validPositions
     }
-
 }

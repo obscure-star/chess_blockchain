@@ -3,11 +3,11 @@
  */
 package chess
 
-import common.model.Game
-import common.model.players.BlackPlayer
-import common.model.players.WhitePlayer
+import chess.common.model.Game
+import chess.common.model.players.BlackPlayer
+import chess.common.model.players.WhitePlayer
 
-fun main(args: Array<String>) {
+fun main() {
     fancyPrintln("Welcome to the best game of Chess!")
     do {
         fancyPrintln("Input a player (white/black): ")
@@ -23,29 +23,35 @@ fun main(args: Array<String>) {
 }
 
 fun startGame(player: String) {
-    var game: Game
+    val game: Game
     if (player == "white") {
-        game = Game(
-            pickedPlayer = WhitePlayer(
-                name = "white",
-                points = 0L
-            ),
-            otherPlayer = BlackPlayer(
-                name = "black",
-                points = 0L
-            ),
-        )
+        game =
+            Game(
+                pickedPlayer =
+                    WhitePlayer(
+                        name = "white",
+                        points = 0L,
+                    ),
+                otherPlayer =
+                    BlackPlayer(
+                        name = "black",
+                        points = 0L,
+                    ),
+            )
     } else {
-        game = Game(
-            pickedPlayer = BlackPlayer(
-                name = "black",
-                points = 0L
-            ),
-            otherPlayer = WhitePlayer(
-                name = "white",
-                points = 0L
-            ),
-        )
+        game =
+            Game(
+                pickedPlayer =
+                    BlackPlayer(
+                        name = "black",
+                        points = 0L,
+                    ),
+                otherPlayer =
+                    WhitePlayer(
+                        name = "white",
+                        points = 0L,
+                    ),
+            )
     }
     game.start()
 }

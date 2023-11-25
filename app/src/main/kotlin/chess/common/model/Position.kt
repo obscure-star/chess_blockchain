@@ -1,9 +1,9 @@
-package common.model
+package chess.common.model
 
 data class Position(
     val row: Int,
-    val column: String
-){
+    val column: String,
+) {
     override fun toString(): String {
         return "$column$row"
     }

@@ -1,5 +1,6 @@
 package chess
-fun fancyPrintln(input: Any){
+
+fun fancyPrintln(input: Any) {
     println()
     println(input)
     println()

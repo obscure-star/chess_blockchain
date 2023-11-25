@@ -1,17 +1,23 @@
-package common.model.pieceTypes
+package chess.common.model.pieceTypes
 
+import chess.common.model.Position
 import chess.toColumn
 import chess.toColumnNumber
-import common.model.Position
 
 data class Bishop(
     override val name: String = "bishop",
     override val image: String = " B ",
-): PieceType{
-    override fun movePattern(position: Position, playerPiecePositions: List<String>): Set<Position> {
+) : PieceType {
+    override fun movePattern(
+        position: Position,
+        playerPiecePositions: List<String>,
+    ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
-        fun addToValidPositions(colOffset: Int, rowMultiplier: Int) {
+        fun addToValidPositions(
+            colOffset: Int,
+            rowMultiplier: Int,
+        ) {
             var col = position.column.toColumnNumber() + colOffset
             var newRow = position.row + rowMultiplier * colOffset
 

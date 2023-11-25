@@ -1,22 +1,28 @@
-package common.model.pieceTypes
+package chess.common.model.pieceTypes
 
+import chess.common.model.Position
 import chess.toColumn
 import chess.toColumnNumber
-import common.model.Position
 
 data class Pawn(
     override val name: String = "pawn",
-    override val image: String = " P "
-): PieceType{
-    override fun movePattern(position: Position, playerPiecePositions: List<String>): Set<Position> {
+    override val image: String = " P ",
+) : PieceType {
+    override fun movePattern(
+        position: Position,
+        playerPiecePositions: List<String>,
+    ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
-        fun addIfValid(colOffset: Int, rowOffset: Int) {
+        fun addIfValid(
+            colOffset: Int,
+            rowOffset: Int,
+        ) {
             val col = position.column.toColumnNumber() + colOffset
             val newRow = position.row + rowOffset
 
             if (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {
-                validPositions.add(Position(newRow, (col+1).toColumn()))
+                validPositions.add(Position(newRow, (col + 1).toColumn()))
             }
         }
 
@@ -30,12 +36,10 @@ data class Pawn(
 
         //  TODO("Add opponents pieces too")
         // Pawn captures diagonally
-        //addIfValid(1, 1)
-        //addIfValid(-1, 1)
+        // addIfValid(1, 1)
+        // addIfValid(-1, 1)
 
         println("These are the valid positions: $validPositions")
         return validPositions
     }
-
-
 }

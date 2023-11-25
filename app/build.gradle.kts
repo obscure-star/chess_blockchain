@@ -11,6 +11,8 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+
+    id("com.diffplug.spotless") version "6.22.0"
 }
 
 repositories {
@@ -26,9 +28,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
 
-    // This dependency is used by the application.
-    implementation("com.google.guava:guava:31.1-jre")
+spotless {
+    kotlin {
+        target("**/*.kt", "**/*.kts")
+        ktlint()
+    }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

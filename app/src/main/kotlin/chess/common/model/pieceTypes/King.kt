@@ -1,17 +1,23 @@
-package common.model.pieceTypes
+package chess.common.model.pieceTypes
 
+import chess.common.model.Position
 import chess.toColumn
 import chess.toColumnNumber
-import common.model.Position
 
 data class King(
     override val name: String = "king",
-    override val image: String = " K "
-): PieceType{
-    override fun movePattern(position: Position, playerPiecePositions: List<String>): Set<Position> {
+    override val image: String = " K ",
+) : PieceType {
+    override fun movePattern(
+        position: Position,
+        playerPiecePositions: List<String>,
+    ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
-        fun addIfValid(colOffset: Int, rowOffset: Int) {
+        fun addIfValid(
+            colOffset: Int,
+            rowOffset: Int,
+        ) {
             val col = position.column.toColumnNumber() + colOffset
             val newRow = position.row + rowOffset
 
@@ -41,5 +47,4 @@ data class King(
         println("These are the valid positions: $validPositions")
         return validPositions
     }
-
 }
