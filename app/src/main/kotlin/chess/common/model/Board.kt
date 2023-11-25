@@ -11,10 +11,8 @@ import chess.toColumnNumber
 class Board {
     lateinit var board: List<MutableList<Piece>>
 
-    fun buildBoard(currentPlayer: Player) {
-        if (currentPlayer.ownPieces.isEmpty()) {
-            buildDefaultBoard()
-        }
+    fun buildBoard() {
+        buildDefaultBoard()
     }
 
     private fun buildDefaultBoard() {

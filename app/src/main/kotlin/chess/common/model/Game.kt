@@ -4,13 +4,17 @@ import chess.common.model.players.Player
 import chess.fancyPrintln
 
 class Game(val pickedPlayer: Player, val otherPlayer: Player) {
-    private var currentPlayer: Player = pickedPlayer
+    private var currentPlayer: Player
     private val board = Board()
 
-    fun start() {
-        board.buildBoard(pickedPlayer)
+    init {
+        currentPlayer = if (pickedPlayer.name == "white"){ pickedPlayer } else otherPlayer
+        board.buildBoard()
         pickedPlayer.setOwnPieces()
         otherPlayer.setOwnPieces()
+    }
+
+    fun start() {
         // keep game running
         do {
             playerAction()
