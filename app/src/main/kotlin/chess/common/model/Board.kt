@@ -2,7 +2,6 @@ package chess.common.model
 
 import chess.common.model.pieceTypes.Empty
 import chess.common.model.players.BlackPlayer
-import chess.common.model.players.Player
 import chess.common.model.players.WhitePlayer
 import chess.fancyPrintln
 import chess.toColumn

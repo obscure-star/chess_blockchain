@@ -8,7 +8,13 @@ class Game(val pickedPlayer: Player, val otherPlayer: Player) {
     private val board = Board()
 
     init {
-        currentPlayer = if (pickedPlayer.name == "white"){ pickedPlayer } else otherPlayer
+        currentPlayer =
+            if (pickedPlayer.name == "white")
+                {
+                    pickedPlayer
+                } else {
+                otherPlayer
+            }
         board.buildBoard()
         pickedPlayer.setOwnPieces()
         otherPlayer.setOwnPieces()
