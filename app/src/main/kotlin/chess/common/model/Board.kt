@@ -9,16 +9,6 @@ import chess.toColumn
 import chess.toColumnNumber
 
 class Board {
-    private val blackPlayer: BlackPlayer =
-        BlackPlayer(
-            name = "black",
-            points = 0L,
-        )
-    private val whitePlayer: WhitePlayer =
-        WhitePlayer(
-            name = "white",
-            points = 0L,
-        )
     lateinit var board: List<MutableList<Piece>>
 
     fun buildBoard(currentPlayer: Player) {
@@ -28,8 +18,16 @@ class Board {
     }
 
     private fun buildDefaultBoard() {
-        val whitePieces = whitePlayer.defaultPieces()
-        val blackPieces = blackPlayer.defaultPieces()
+        val whitePieces =
+            WhitePlayer(
+                name = "white",
+                points = 0L,
+            ).defaultPieces()
+        val blackPieces =
+            BlackPlayer(
+                name = "black",
+                points = 0L,
+            ).defaultPieces()
         board = blackPieces +
             List(4) { row ->
                 MutableList(8) {
