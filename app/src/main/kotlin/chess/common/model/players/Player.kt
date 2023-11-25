@@ -7,15 +7,19 @@ interface Player {
     var points: Long
     val ownPieces: Set<Piece>
     val wonPieces: Set<Piece>
+    val selectedPiece: Piece?
+    val destinationPiece: Piece?
 
     fun defaultPieces(): List<List<Piece>>
 
     fun setOwnPieces()
 
     fun updateOwnPieces(
-        selectedPiece: Piece,
-        destinationPiece: Piece,
+        selectedPiece: Piece?,
+        destinationPiece: Piece?,
     )
 
-    fun piecePositions(): List<String>
+    fun setSelectedPiece(piece: Piece): Boolean
+
+    fun setDestinationPiece(piece: Piece): Boolean
 }

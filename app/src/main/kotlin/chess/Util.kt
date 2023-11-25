@@ -3,7 +3,6 @@ package chess
 fun fancyPrintln(input: Any) {
     println()
     println(input)
-    println()
 }
 
 fun Int.toColumn(): String {

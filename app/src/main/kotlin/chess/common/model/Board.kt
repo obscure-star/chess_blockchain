@@ -4,6 +4,7 @@ import chess.common.model.pieceTypes.Empty
 import chess.common.model.players.BlackPlayer
 import chess.common.model.players.Player
 import chess.common.model.players.WhitePlayer
+import chess.fancyPrintln
 import chess.toColumn
 import chess.toColumnNumber
 
@@ -41,6 +42,7 @@ class Board {
     }
 
     fun printBoard() {
+        println()
         for ((i, row) in board.withIndex()) {
             print(" ${8 - i} | ")
             for (square in row) {
@@ -53,9 +55,17 @@ class Board {
     }
 
     fun swapPieces(
-        selectedPiece: Piece,
-        destinationPiece: Piece,
+        selectedPiece: Piece?,
+        destinationPiece: Piece?,
     ) {
+        if (selectedPiece == null) {
+            fancyPrintln("selected piece is null")
+            return
+        }
+        if (destinationPiece == null) {
+            fancyPrintln("destination piece is null")
+            return
+        }
         val initialRow = 8 - (selectedPiece.position.row)
         val initialCol = selectedPiece.position.column.toColumnNumber()
 

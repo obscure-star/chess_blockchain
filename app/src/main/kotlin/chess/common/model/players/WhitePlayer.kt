@@ -8,12 +8,15 @@ import chess.common.model.pieceTypes.Knight
 import chess.common.model.pieceTypes.Pawn
 import chess.common.model.pieceTypes.Queen
 import chess.common.model.pieceTypes.Rook
+import chess.fancyPrintln
 
 data class WhitePlayer(
     override val name: String,
     override var points: Long,
     override var ownPieces: Set<Piece> = emptySet(),
     override var wonPieces: Set<Piece> = emptySet(),
+    override var selectedPiece: Piece? = null,
+    override var destinationPiece: Piece? = null,
 ) : Player {
     override fun defaultPieces(): MutableList<MutableList<Piece>> {
         return mutableListOf(
@@ -175,9 +178,17 @@ data class WhitePlayer(
     }
 
     override fun updateOwnPieces(
-        selectedPiece: Piece,
-        destinationPiece: Piece,
+        selectedPiece: Piece?,
+        destinationPiece: Piece?,
     ) {
+        if (selectedPiece == null) {
+            fancyPrintln("selected piece is null. Can't update own pieces.")
+            return
+        }
+        if (destinationPiece == null) {
+            fancyPrintln("destination piece is null. Can't update own pieces.")
+            return
+        }
         val pieceToUpdate = ownPieces.find { it.position == selectedPiece.position }
 
         // Check if the piece is found before attempting to update
@@ -187,7 +198,27 @@ data class WhitePlayer(
         }
     }
 
-    override fun piecePositions(): List<String> {
+    override fun setSelectedPiece(piece: Piece): Boolean {
+        if (ownPiecePositions().contains(piece.position.toString())) {
+            selectedPiece = piece
+            return true
+        }
+        selectedPiece = null
+        return false
+    }
+
+    override fun setDestinationPiece(piece: Piece): Boolean {
+        val selectedPiece = selectedPiece ?: return false
+        selectedPiece.setOpenMoves(ownPiecePositions())
+        if (selectedPiece.openMoves.any { position -> position.toString() == piece.position.toString() }) {
+            destinationPiece = piece
+            return true
+        }
+        destinationPiece = null
+        return false
+    }
+
+    private fun ownPiecePositions(): List<String> {
         return ownPieces.map { it.position.toString() }
     }
 }
