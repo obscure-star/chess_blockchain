@@ -6,6 +6,7 @@ import chess.toColumnNumber
 
 data class King(
     override val name: String = "king",
+    override val point: Int? = null,
     override val image: String = " K ",
 ) : PieceType {
     override fun movePattern(

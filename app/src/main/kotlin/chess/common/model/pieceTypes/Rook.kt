@@ -6,6 +6,7 @@ import chess.toColumnNumber
 
 data class Rook(
     override val name: String = "rook",
+    override val point: Int = 5,
     override val image: String = " R ",
 ) : PieceType {
     override fun movePattern(

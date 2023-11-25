@@ -18,3 +18,7 @@ fun String.toColumnNumber(): Int {
         else -> throw IllegalArgumentException("Invalid column: $this. Column should be between 'a' and 'h'.")
     }
 }
+
+fun checkExitGame(input: String?): Boolean {
+    return input == "q"
+}

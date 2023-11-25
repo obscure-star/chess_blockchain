@@ -11,47 +11,47 @@ fun main() {
     fancyPrintln("Welcome to the best game of Chess!")
     do {
         fancyPrintln("Input a player (white/black): ")
-        val player = readlnOrNull()
-        val correctInput = player?.matches(Regex("^(white|black)$")) == true
+        val inputPlayer = readlnOrNull()
+        if (checkExitGame(inputPlayer)) {
+            fancyPrintln("exiting game :(")
+            return
+        }
+        val correctInput = inputPlayer?.matches(Regex("^(white|black)$")) == true
         if (correctInput) {
-            fancyPrintln("You will be playing as $player")
-            startGame(player!!)
+            fancyPrintln("You will be playing as $inputPlayer")
+            startGame(inputPlayer!!)
         } else {
-            fancyPrintln("You didn't enter white or black. You entered: $player. Please enter (white/black).")
+            fancyPrintln("You didn't enter white or black. You entered: $inputPlayer. Please enter (white/black).")
         }
     } while (!correctInput)
 }
 
 fun startGame(player: String) {
-    val game: Game
     if (player == "white") {
-        game =
-            Game(
-                pickedPlayer =
-                    WhitePlayer(
-                        name = "white",
-                        points = 0L,
-                    ),
-                otherPlayer =
-                    BlackPlayer(
-                        name = "black",
-                        points = 0L,
-                    ),
-            )
+        Game.startNewGame(
+            pickedPlayer =
+                WhitePlayer(
+                    name = "white",
+                    playerPoints = 0,
+                ),
+            otherPlayer =
+                BlackPlayer(
+                    name = "black",
+                    playerPoints = 0,
+                ),
+        )
     } else {
-        game =
-            Game(
-                pickedPlayer =
-                    BlackPlayer(
-                        name = "black",
-                        points = 0L,
-                    ),
-                otherPlayer =
-                    WhitePlayer(
-                        name = "white",
-                        points = 0L,
-                    ),
-            )
+        Game.startNewGame(
+            pickedPlayer =
+                BlackPlayer(
+                    name = "black",
+                    playerPoints = 0,
+                ),
+            otherPlayer =
+                WhitePlayer(
+                    name = "white",
+                    playerPoints = 0,
+                ),
+        )
     }
-    game.start()
 }

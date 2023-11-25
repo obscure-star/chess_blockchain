@@ -6,6 +6,7 @@ import chess.toColumnNumber
 
 data class BlackPawn(
     override val name: String = "black_pawn",
+    override val point: Int = 1,
     override val image: String = " P ",
 ) : PieceType {
     override fun movePattern(
@@ -18,7 +19,7 @@ data class BlackPawn(
             colOffset: Int,
             rowOffset: Int,
         ) {
-            val col = position.column.toColumnNumber() + colOffset + 1
+            val col = position.column.toColumnNumber() + colOffset
             val newRow = position.row + rowOffset
 
             if (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {

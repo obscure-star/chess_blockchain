@@ -4,6 +4,7 @@ import chess.common.model.Position
 
 data class Empty(
     override val name: String = "empty",
+    override val point: Int = 0,
     override val image: String = " _ ",
 ) : PieceType {
     override fun movePattern(

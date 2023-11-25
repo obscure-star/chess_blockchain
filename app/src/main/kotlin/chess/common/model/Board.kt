@@ -11,19 +11,15 @@ class Board {
     lateinit var board: List<MutableList<Piece>>
 
     fun buildBoard() {
-        buildDefaultBoard()
-    }
-
-    private fun buildDefaultBoard() {
         val whitePieces =
             WhitePlayer(
                 name = "white",
-                points = 0L,
+                playerPoints = 0,
             ).defaultPieces()
         val blackPieces =
             BlackPlayer(
                 name = "black",
-                points = 0L,
+                playerPoints = 0,
             ).defaultPieces()
         board = blackPieces +
             List(4) { row ->
@@ -41,7 +37,7 @@ class Board {
         for ((i, row) in board.withIndex()) {
             print(" ${8 - i} | ")
             for (square in row) {
-                print(square.pieceType?.image)
+                print(square.pieceType.image)
             }
             println()
         }

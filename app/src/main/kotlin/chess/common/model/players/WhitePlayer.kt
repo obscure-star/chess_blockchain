@@ -12,9 +12,10 @@ import chess.fancyPrintln
 
 data class WhitePlayer(
     override val name: String,
-    override var points: Long,
+    override var playerPoints: Int = 0,
     override var ownPieces: Set<Piece> = emptySet(),
     override var wonPieces: Set<Piece> = emptySet(),
+    override var lostPieces: Set<Piece> = emptySet(),
     override var selectedPiece: Piece? = null,
     override var destinationPiece: Piece? = null,
 ) : Player {
@@ -189,11 +190,13 @@ data class WhitePlayer(
             fancyPrintln("destination piece is null. Can't update own pieces.")
             return
         }
-        val pieceToUpdate = ownPieces.find { it.position == selectedPiece.position }
+        val selectedPiecePosition = selectedPiece.position.copy()
+        val pieceToUpdate = ownPieces.find { it.position == selectedPiecePosition }
 
         // Check if the piece is found before attempting to update
         if (pieceToUpdate != null) {
-            pieceToUpdate.position = destinationPiece.position
+            pieceToUpdate.position = destinationPiece.position.copy()
+            destinationPiece.position = selectedPiecePosition
             pieceToUpdate.clearOpenMoves()
         }
     }
@@ -216,6 +219,23 @@ data class WhitePlayer(
         }
         destinationPiece = null
         return false
+    }
+
+    override fun setWonPieces() {
+        wonPieces = destinationPiece?.let { wonPieces.plus(it.copy()) } ?: wonPieces
+    }
+
+    override fun setLostPieces(destinationPiece: Piece?) {
+        if (destinationPiece != null) {
+            if (destinationPiece.name != "empty") {
+                ownPieces = ownPieces.minus(destinationPiece)
+                lostPieces = lostPieces.plus(destinationPiece.copy())
+            }
+        }
+    }
+
+    override fun updatePlayerPoints() {
+        playerPoints = playerPoints.plus(destinationPiece?.pieceType?.point ?: 0)
     }
 
     private fun ownPiecePositions(): List<String> {

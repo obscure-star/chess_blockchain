@@ -1,38 +1,44 @@
 package chess.common.model
 
+import chess.checkExitGame
 import chess.common.model.players.Player
 import chess.fancyPrintln
 
-class Game(val pickedPlayer: Player, val otherPlayer: Player) {
+class Game private constructor(val firstPlayer: Player, val secondPlayer: Player) {
     private var currentPlayer: Player
-    private val board = Board()
+    private var otherPlayer: Player
+    val board = Board()
+    // private val log = KotlinLogging.logger { }
 
     init {
-        currentPlayer =
-            if (pickedPlayer.name == "white")
-                {
-                    pickedPlayer
-                } else {
-                otherPlayer
-            }
+        if (firstPlayer.name == "white") {
+            currentPlayer = firstPlayer
+            otherPlayer = secondPlayer
+        } else {
+            currentPlayer = secondPlayer
+            otherPlayer = secondPlayer
+        }
         board.buildBoard()
-        pickedPlayer.setOwnPieces()
-        otherPlayer.setOwnPieces()
+        firstPlayer.setOwnPieces()
+        secondPlayer.setOwnPieces()
     }
 
     fun start() {
         // keep game running
         do {
-            playerAction()
-            fancyPrintln("${currentPlayer.name}'s turn. Press enter to continue. Press q to quit")
-        } while (readlnOrNull() != "q")
-        fancyPrintln("exiting game :(")
+            val continueGame = playerAction()
+        } while (continueGame)
     }
 
-    private fun playerAction() {
+    private fun playerAction(): Boolean {
         do {
             fancyPrintln("Please enter your move (example: e2-e4): ")
+            // log.info { "Please enter your move (example: e2-e4): " }
             val move = readlnOrNull()
+            if (checkExitGame(move)) {
+                fancyPrintln("exiting game :(")
+                return false
+            }
             val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
             var isMoveValid = false
             if (isCorrectInput) {
@@ -41,16 +47,20 @@ class Game(val pickedPlayer: Player, val otherPlayer: Player) {
                 fancyPrintln("Please enter a valid move like (e2-e4)")
             }
         } while (!isCorrectInput || !isMoveValid)
+        updatePlayerPieces()
+        updateScores()
         updateBoard()
-        updatePlayer()
         board.printBoard()
         // switch current player
-        currentPlayer =
-            if (currentPlayer.name == "white") {
-                otherPlayer
-            } else {
-                pickedPlayer
-            }
+        if (currentPlayer.name == "white") {
+            currentPlayer = secondPlayer
+            otherPlayer = firstPlayer
+        } else {
+            currentPlayer = firstPlayer
+            otherPlayer = secondPlayer
+        }
+        fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
+        return true
     }
 
     private fun checkMove(move: String): Boolean {
@@ -68,7 +78,22 @@ class Game(val pickedPlayer: Player, val otherPlayer: Player) {
             } ?: return false.also {
                 fancyPrintln("$selectedPosition is an invalid destination")
             }
+
         return currentPlayer.setSelectedPiece(selectedPiece) && currentPlayer.setDestinationPiece(destinationPiece)
+    }
+
+    private fun updatePlayerPieces() {
+        currentPlayer.updateOwnPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
+    }
+
+    private fun updateScores() {
+        if (currentPlayer.destinationPiece?.name?.contains(otherPlayer.name) == true) {
+            currentPlayer.setWonPieces()
+            currentPlayer.updatePlayerPoints()
+            otherPlayer.setLostPieces(currentPlayer.destinationPiece)
+            // update destination piece to empty
+            currentPlayer.destinationPiece?.makeEmpty()
+        }
     }
 
     private fun updateBoard() {
@@ -80,7 +105,19 @@ class Game(val pickedPlayer: Player, val otherPlayer: Player) {
         board.swapPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
     }
 
-    private fun updatePlayer() {
-        currentPlayer.updateOwnPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
+    companion object {
+        private var currentGame: Game? = null
+
+        fun startNewGame(
+            pickedPlayer: Player,
+            otherPlayer: Player,
+        ) {
+            currentGame = Game(pickedPlayer, otherPlayer)
+            currentGame?.start()
+        }
+
+        fun getCurrentGame(): Game? {
+            return currentGame
+        }
     }
 }

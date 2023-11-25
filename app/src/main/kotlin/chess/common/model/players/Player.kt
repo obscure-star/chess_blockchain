@@ -4,9 +4,10 @@ import chess.common.model.Piece
 
 interface Player {
     val name: String
-    var points: Long
+    var playerPoints: Int
     val ownPieces: Set<Piece>
     val wonPieces: Set<Piece>
+    val lostPieces: Set<Piece>
     val selectedPiece: Piece?
     val destinationPiece: Piece?
 
@@ -22,4 +23,10 @@ interface Player {
     fun setSelectedPiece(piece: Piece): Boolean
 
     fun setDestinationPiece(piece: Piece): Boolean
+
+    fun setWonPieces()
+
+    fun setLostPieces(destinationPiece: Piece?)
+
+    fun updatePlayerPoints()
 }

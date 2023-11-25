@@ -1,19 +1,27 @@
 package chess.common.model
 
+import chess.common.model.pieceTypes.Empty
 import chess.common.model.pieceTypes.PieceType
 
 data class Piece(
-    val name: String?,
-    val pieceType: PieceType?,
+    var name: String?,
+    var pieceType: PieceType = Empty(),
     var position: Position = Position(1, "a"),
     var openMoves: Set<Position> = emptySet(),
     var restrictedMoves: Set<Position> = emptySet(),
 ) {
     fun setOpenMoves(playerPiecePosition: List<String>) {
-        openMoves = pieceType?.movePattern(position, playerPiecePositions = playerPiecePosition) ?: emptySet()
+        openMoves = pieceType.movePattern(position, playerPiecePositions = playerPiecePosition)
     }
 
     fun clearOpenMoves() {
         openMoves = emptySet()
+    }
+
+    fun makeEmpty() {
+        name = "empty"
+        pieceType = Empty()
+        openMoves = emptySet()
+        restrictedMoves = emptySet()
     }
 }

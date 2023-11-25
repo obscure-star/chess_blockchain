@@ -3,9 +3,11 @@ package chess.common.model.pieceTypes
 import chess.common.model.Position
 import chess.toColumn
 import chess.toColumnNumber
+import kotlin.math.abs
 
 data class Knight(
     override val name: String = "knight",
+    override val point: Int = 3,
     override val image: String = " N ",
 ) : PieceType {
     override fun movePattern(
@@ -31,7 +33,7 @@ data class Knight(
 
         for (colOffset in knightOffsets) {
             for (rowOffset in knightOffsets) {
-                if (Math.abs(colOffset) != Math.abs(rowOffset)) {
+                if (abs(colOffset) != abs(rowOffset)) {
                     addIfValid(colOffset, rowOffset)
                 }
             }
