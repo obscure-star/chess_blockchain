@@ -1,0 +1,66 @@
+package common.model
+
+import chess.toColumn
+import chess.toColumnNumber
+import common.model.pieceTypes.Empty
+import common.model.players.BlackPlayer
+import common.model.players.Player
+import common.model.players.WhitePlayer
+
+class Board {
+    val blackPlayer: BlackPlayer = BlackPlayer(
+         name = "black",
+         points = 0L,
+        )
+    val whitePlayer: WhitePlayer = WhitePlayer(
+        name = "white",
+        points = 0L,
+    )
+    lateinit var board: List<MutableList<Piece>>
+
+    fun buildBoard(currentPlayer: Player, otherPlayer: Player){
+        if(currentPlayer.ownPieces.isEmpty()){
+            buildDefaultBoard(currentPlayer)
+        }
+     }
+
+    private fun buildDefaultBoard(currentPlayer: Player){
+        val whitePieces = whitePlayer.defaultPieces()
+        val blackPieces = blackPlayer.defaultPieces()
+        board = blackPieces + List(4){ row -> MutableList(8) {
+            col -> Piece(name = "empty", pieceType = Empty(), position = Position(6-row, (col+1).toColumn()))
+        } } + whitePieces
+        printBoard()
+    }
+
+    fun printBoard(){
+        for ((i, row) in board.withIndex()) {
+            print(" ${8 - i} | ")
+            for (square in row) {
+                print(square.pieceType?.image)
+            }
+            println()
+        }
+        println("   |  _  _  _  _  _  _  _  _ ")
+        println("   |  a  b  c  d  e  f  g  h ")
+    }
+
+    fun swapPieces(selectedPiece: Piece, destinationPiece: Piece) {
+        val initialRow = 8 - (selectedPiece.position.row)
+        val initialCol = selectedPiece.position.column.toColumnNumber()
+
+        val finalRow = 8 - (destinationPiece.position.row)
+        val finalCol = destinationPiece.position.column.toColumnNumber()
+
+        val initialPiece = board[initialRow][initialCol].copy()
+        val finalPiece = board[finalRow][finalCol].copy()
+
+        // swap the positions
+        initialPiece.position = Position(row = destinationPiece.position.row, column = destinationPiece.position.column)
+        finalPiece.position = Position(row = selectedPiece.position.row, column = selectedPiece.position.column)
+
+        // Swap the pieces on the board
+        board[initialRow][initialCol] = finalPiece
+        board[finalRow][finalCol] = initialPiece
+    }
+ }
