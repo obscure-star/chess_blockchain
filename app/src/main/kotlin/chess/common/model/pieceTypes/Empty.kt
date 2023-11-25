@@ -10,6 +10,6 @@ data class Empty(
         position: Position,
         playerPiecePositions: List<String>,
     ): Set<Position> {
-        TODO("Not yet implemented")
+        return emptySet()
     }
 }

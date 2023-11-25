@@ -18,7 +18,7 @@ data class Pawn(
             colOffset: Int,
             rowOffset: Int,
         ) {
-            val col = position.column.toColumnNumber() + colOffset
+            val col = position.column.toColumnNumber() + colOffset + 1
             val newRow = position.row + rowOffset
 
             if (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {

@@ -18,7 +18,7 @@ data class Queen(
             colOffset: Int,
             rowOffset: Int,
         ) {
-            var col = position.column.toColumnNumber() + colOffset
+            var col = position.column.toColumnNumber() + colOffset + 1
             var newRow = position.row + rowOffset
 
             while (col in 1..8 && newRow in 1..8) {
