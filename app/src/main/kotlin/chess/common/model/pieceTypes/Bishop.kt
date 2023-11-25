@@ -18,7 +18,7 @@ data class Bishop(
             colOffset: Int,
             rowMultiplier: Int,
         ) {
-            var col = position.column.toColumnNumber() + colOffset
+            var col = position.column.toColumnNumber() + colOffset + 1
             var newRow = position.row + rowMultiplier * colOffset
 
             while (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {
