@@ -202,7 +202,7 @@ data class BlackPlayer(
     }
 
     override fun setSelectedPiece(piece: Piece): Boolean {
-        if (ownPiecePositions().contains(piece.position.toString())) {
+        if (ownPiecePositions().any { it == piece.position.toString() || it == piece.position.toString() + "k" }) {
             selectedPiece = piece
             return true
         }
@@ -242,6 +242,12 @@ data class BlackPlayer(
     }
 
     override fun ownPiecePositions(): List<String> {
-        return ownPieces.map { it.position.toString() }
+        return ownPieces.map { piece: Piece ->
+            if (piece.name?.contains("king") == true) {
+                piece.position.toString() + "k"
+            } else {
+                piece.position.toString()
+            }
+        }
     }
 }

@@ -17,19 +17,35 @@ data class Bishop(
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
+        fun isCheck(
+            newCol: Int,
+            newRow: Int,
+        ): Boolean {
+            return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
+                if (it) {
+                    fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
+                }
+            }
+        }
+
         fun addToValidPositions(
             colOffset: Int,
             rowMultiplier: Int,
         ) {
-            var col = position.column.toColumnNumber() + colOffset + 1
+            var newCol = position.column.toColumnNumber() + colOffset + 1
             var newRow = position.row + rowMultiplier * colOffset
 
-            while (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {
-                validPositions.add(Position(newRow, col.toColumn()))
-                if (otherPlayerPiecePositions.contains("${col.toColumn()}$newRow")) {
+            while (newCol in 1..8 && newRow in 1..8 &&
+                !playerPiecePositions.contains("${newCol.toColumn()}$newRow")
+            ) {
+                if (isCheck(newCol, newRow)) {
                     break
                 }
-                col += colOffset
+                validPositions.add(Position(newRow, newCol.toColumn()))
+                if (otherPlayerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
+                    break
+                }
+                newCol += colOffset
                 newRow += rowMultiplier * colOffset
             }
         }

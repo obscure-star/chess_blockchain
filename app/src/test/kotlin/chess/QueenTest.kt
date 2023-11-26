@@ -59,6 +59,24 @@ class QueenTest {
         assertNull(game?.firstPlayer?.destinationPiece)
     }
 
+    @Test
+    fun `test for white queen (d1) can't take black king (e8)`() {
+        provideInput("white", "e2-e4", "e7-e5", "d1-h5", "f7-f5", "h5-e8", "h5-f7", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "black_king",
+            board[0]["e".toColumnNumber()].name,
+        )
+    }
+
     private fun provideInput(vararg inputs: String) {
         System.setIn(ByteArrayInputStream(inputs.joinToString("\n").toByteArray()))
     }

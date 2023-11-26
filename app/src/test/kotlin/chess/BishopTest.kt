@@ -63,6 +63,24 @@ class BishopTest {
         )
     }
 
+    @Test
+    fun `test for black bishop (b4) can't get to king (e1)`() {
+        provideInput("white", "e2-e4", "e7-e6", "f1-b5", "f8-b4", "b5-d7", "b4-d2", "d7-c8", "d2-e1", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "white_king",
+            board[7]["e".toColumnNumber()].name,
+        )
+    }
+
     private fun provideInput(vararg inputs: String) {
         System.setIn(ByteArrayInputStream(inputs.joinToString("\n").toByteArray()))
     }

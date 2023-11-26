@@ -59,6 +59,24 @@ class RookTest {
         assertNull(game?.firstPlayer?.destinationPiece)
     }
 
+    @Test
+    fun `white rook (d1) can't take black king (e8)`() {
+        provideInput("white", "h2-h4", "g7-g5", "h4-g5", "h7-h6", "h1-h6", "e7-e6", "h6-e6", "e8-e7", "e6-e7", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "black_king",
+            board[1]["e".toColumnNumber()].name,
+        )
+    }
+
     private fun provideInput(vararg inputs: String) {
         System.setIn(ByteArrayInputStream(inputs.joinToString("\n").toByteArray()))
     }

@@ -50,6 +50,7 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
         updateDestinationPiece()
         updateBoard()
         board.printBoard()
+
         // switch current player
         if (currentPlayer.name == "white") {
             currentPlayer = secondPlayer

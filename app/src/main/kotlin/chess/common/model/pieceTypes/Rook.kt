@@ -17,25 +17,36 @@ data class Rook(
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
+        fun isCheck(
+            newCol: Int,
+            newRow: Int,
+        ): Boolean {
+            return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
+                if (it) {
+                    fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
+                }
+            }
+        }
+
         fun addIfValid(
             colOffset: Int,
             rowOffset: Int,
         ) {
-            var col = position.column.toColumnNumber() + colOffset + 1
+            var newCol = position.column.toColumnNumber() + colOffset + 1
             var newRow = position.row + rowOffset
 
-            while (col in 1..8 && newRow in 1..8) {
-                if (playerPiecePositions.contains("${col.toColumn()}$newRow")) {
+            while (newCol in 1..8 && newRow in 1..8) {
+                if (playerPiecePositions.contains("${newCol.toColumn()}$newRow") || isCheck(newCol, newRow)) {
                     break // Stop if we encounter our own piece
                 }
 
-                validPositions.add(Position(newRow, col.toColumn()))
+                validPositions.add(Position(newRow, newCol.toColumn()))
 
-                if (otherPlayerPiecePositions.contains("${col.toColumn()}$newRow")) {
+                if (otherPlayerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
                     break // Stop if we encounter an opponent's piece
                 }
 
-                col += colOffset
+                newCol += colOffset
                 newRow += rowOffset
             }
         }

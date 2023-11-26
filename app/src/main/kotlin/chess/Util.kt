@@ -7,7 +7,7 @@ fun fancyPrintln(input: Any) {
 
 fun Int.toColumn(): String {
     return when (this) {
-        in 1..8 -> ('a' + this - 1).toString()
+        in 1..9 -> ('a' + this - 1).toString()
         else -> throw IllegalArgumentException("Invalid column number: $this. Column number should be between 0 and 7.")
     }
 }
