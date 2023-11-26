@@ -10,6 +10,7 @@ interface Player {
     val lostPieces: Set<Piece>
     val selectedPiece: Piece?
     val destinationPiece: Piece?
+    var isChecked: Boolean
 
     fun defaultPieces(): List<List<Piece>>
 
@@ -34,4 +35,8 @@ interface Player {
     fun updatePlayerPoints()
 
     fun ownPiecePositions(): List<String>
+
+    fun setCheck()
+
+    fun unCheck()
 }

@@ -18,17 +18,6 @@ data class BlackPawn(
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
-        fun isCheck(
-            newCol: Int,
-            newRow: Int,
-        ): Boolean {
-            return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
-                if (it) {
-                    fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
-                }
-            }
-        }
-
         fun isKill(
             newCol: Int,
             newRow: Int,
@@ -48,12 +37,12 @@ data class BlackPawn(
                 if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow") &&
                     (
                         isKill(newCol, newRow, colOffset, rowOffset) || abs(colOffset) != abs(rowOffset)
-                    ) && !isCheck(newCol, newRow)
+                    ) && !canCheck(newCol, newRow, otherPlayerPiecePositions)
                 ) {
                     validPositions.add(Position(newRow, newCol.toColumn()))
                 }
 
-                if (isCheck(newCol, newRow)) {
+                if (canCheck(newCol, newRow, otherPlayerPiecePositions)) {
                     // do something
                 }
             }
@@ -73,5 +62,17 @@ data class BlackPawn(
 
         fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
+    }
+
+    override fun canCheck(
+        newCol: Int,
+        newRow: Int,
+        otherPlayerPiecePositions: List<String>,
+    ): Boolean {
+        return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
+            if (it) {
+                fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
+            }
+        }
     }
 }

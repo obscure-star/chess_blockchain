@@ -17,17 +17,6 @@ data class Queen(
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
-        fun isCheck(
-            newCol: Int,
-            newRow: Int,
-        ): Boolean {
-            return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
-                if (it) {
-                    fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
-                }
-            }
-        }
-
         fun addIfValid(
             colOffset: Int,
             rowOffset: Int,
@@ -36,7 +25,9 @@ data class Queen(
             var newRow = position.row + rowOffset
 
             while (newCol in 1..8 && newRow in 1..8) {
-                if (playerPiecePositions.contains("${newCol.toColumn()}$newRow") || isCheck(newCol, newRow)) {
+                if (playerPiecePositions.contains("${newCol.toColumn()}$newRow") ||
+                    canCheck(newCol, newRow, otherPlayerPiecePositions)
+                ) {
                     break // Stop if we encounter our own piece or check
                 }
 
@@ -70,5 +61,17 @@ data class Queen(
 
         fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
+    }
+
+    override fun canCheck(
+        newCol: Int,
+        newRow: Int,
+        otherPlayerPiecePositions: List<String>,
+    ): Boolean {
+        return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
+            if (it) {
+                fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
+            }
+        }
     }
 }

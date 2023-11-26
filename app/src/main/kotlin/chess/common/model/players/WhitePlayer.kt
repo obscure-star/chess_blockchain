@@ -18,6 +18,7 @@ data class WhitePlayer(
     override var lostPieces: Set<Piece> = emptySet(),
     override var selectedPiece: Piece? = null,
     override var destinationPiece: Piece? = null,
+    override var isChecked: Boolean = false,
 ) : Player {
     override fun defaultPieces(): MutableList<MutableList<Piece>> {
         return mutableListOf(
@@ -249,5 +250,12 @@ data class WhitePlayer(
                 piece.position.toString()
             }
         }
+    }
+
+    override fun setCheck() {
+        TODO("Not yet implemented")
+    }
+
+    override fun unCheck() {
     }
 }

@@ -14,4 +14,12 @@ data class Empty(
     ): Set<Position> {
         return emptySet()
     }
+
+    override fun canCheck(
+        newCol: Int,
+        newRow: Int,
+        otherPlayerPiecePositions: List<String>,
+    ): Boolean {
+        return false
+    }
 }

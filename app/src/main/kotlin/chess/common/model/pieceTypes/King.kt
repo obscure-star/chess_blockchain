@@ -17,17 +17,6 @@ data class King(
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
-        fun isCheck(
-            newCol: Int,
-            newRow: Int,
-        ): Boolean {
-            return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
-                if (it) {
-                    fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
-                }
-            }
-        }
-
         fun addIfValid(
             colOffset: Int,
             rowOffset: Int,
@@ -37,7 +26,7 @@ data class King(
 
             if (newCol in 1..8 && newRow in 1..8 &&
                 !playerPiecePositions.contains("${newCol.toColumn()}$newRow") &&
-                !isCheck(newCol, newRow)
+                !canCheck(newCol, newRow, otherPlayerPiecePositions)
             ) {
                 validPositions.add(Position(newRow, newCol.toColumn()))
             }
@@ -63,5 +52,17 @@ data class King(
 
         fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
+    }
+
+    override fun canCheck(
+        newCol: Int,
+        newRow: Int,
+        otherPlayerPiecePositions: List<String>,
+    ): Boolean {
+        return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
+            if (it) {
+                fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
+            }
+        }
     }
 }

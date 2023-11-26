@@ -10,6 +10,7 @@ data class Piece(
     var position: Position = Position(1, "a"),
     var openMoves: Set<Position> = emptySet(),
     var restrictedMoves: Set<Position> = emptySet(),
+    var canCheck: Boolean = false,
 ) {
     fun setOpenMoves(
         playerPiecePositions: List<String>,
