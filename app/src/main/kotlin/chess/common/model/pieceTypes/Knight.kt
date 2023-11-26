@@ -1,6 +1,7 @@
 package chess.common.model.pieceTypes
 
 import chess.common.model.Position
+import chess.fancyPrintln
 import chess.toColumn
 import chess.toColumnNumber
 import kotlin.math.abs
@@ -39,7 +40,7 @@ data class Knight(
             }
         }
 
-        println("These are the valid positions: $validPositions")
+        fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
 }

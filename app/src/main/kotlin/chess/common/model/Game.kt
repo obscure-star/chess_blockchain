@@ -8,7 +8,6 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
     private var currentPlayer: Player
     private var otherPlayer: Player
     val board = Board()
-    // private val log = KotlinLogging.logger { }
 
     init {
         if (firstPlayer.name == "white") {
@@ -33,7 +32,6 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
     private fun playerAction(): Boolean {
         do {
             fancyPrintln("Please enter your move (example: e2-e4): ")
-            // log.info { "Please enter your move (example: e2-e4): " }
             val move = readlnOrNull()
             if (checkExitGame(move)) {
                 fancyPrintln("exiting game :(")
@@ -90,6 +88,11 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
         if (currentPlayer.destinationPiece?.name?.contains(otherPlayer.name) == true) {
             currentPlayer.setWonPieces()
             currentPlayer.updatePlayerPoints()
+            fancyPrintln(
+                "${currentPlayer.name} has gained " +
+                    "${currentPlayer.destinationPiece?.pieceType?.point} point. " +
+                    "Total point is ${currentPlayer.playerPoints}",
+            )
             otherPlayer.setLostPieces(currentPlayer.destinationPiece)
             // update destination piece to empty
             currentPlayer.destinationPiece?.makeEmpty()

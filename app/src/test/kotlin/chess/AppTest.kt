@@ -8,23 +8,13 @@ import chess.common.model.players.BlackPlayer
 import chess.common.model.players.WhitePlayer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 import kotlin.test.assertEquals
 
 class AppTest {
     private val originalIn = System.`in`
     private val originalOut = System.out
-
-    private val outputStreamCaptor = ByteArrayOutputStream()
-
-    @BeforeEach
-    fun setUp() {
-        System.setOut(PrintStream(outputStreamCaptor))
-    }
 
     @AfterEach
     fun tearDown() {
@@ -58,7 +48,6 @@ class AppTest {
         assertTrue(game?.secondPlayer is BlackPlayer)
         val board = game?.board?.board
         if (board != null) {
-            println(board[1][3])
             assertEquals(board[6][3].name, "black_bishop")
             assertEquals(board[1][4].name, "empty")
         }
