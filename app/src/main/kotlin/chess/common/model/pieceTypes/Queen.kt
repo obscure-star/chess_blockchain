@@ -31,8 +31,8 @@ data class Queen(
 
                 validPositions.add(Position(newRow, col.toColumn()))
 
-                if (playerPiecePositions.contains("${col.toColumn()}$newRow")) {
-                    break // Stop if we encounter an opponent's piece
+                if (otherPlayerPiecePositions.contains("${col.toColumn()}$newRow")) {
+                    break // Stop if we encounter current player piece
                 }
 
                 col += colOffset

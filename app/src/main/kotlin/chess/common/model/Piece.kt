@@ -6,6 +6,7 @@ import chess.common.model.pieceTypes.PieceType
 data class Piece(
     var name: String?,
     var pieceType: PieceType = Empty(),
+    var initialPosition: Position = Position(1, "a"),
     var position: Position = Position(1, "a"),
     var openMoves: Set<Position> = emptySet(),
     var restrictedMoves: Set<Position> = emptySet(),
@@ -26,5 +27,9 @@ data class Piece(
         pieceType = Empty()
         openMoves = emptySet()
         restrictedMoves = emptySet()
+    }
+
+    fun updatePosition(newPosition: Position)  {
+        position = newPosition
     }
 }

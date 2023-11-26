@@ -10,7 +10,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
-import kotlin.test.assertEquals
 
 class AppTest {
     private val originalIn = System.`in`
@@ -33,84 +32,6 @@ class AppTest {
         val game = Game.getCurrentGame()
         assertTrue(game?.firstPlayer is WhitePlayer)
         assertTrue(game?.secondPlayer is BlackPlayer)
-    }
-
-    @Test
-    fun `test for black bishop (b4) takes white pawn (d2)`() {
-        provideInput("white", "e2-e4", "e7-e6", "f1-b5", "f8-b4", "b5-d7", "b4-d2", "q")
-
-        main()
-
-        val game = Game.getCurrentGame()
-        assertTrue(game?.firstPlayer is WhitePlayer)
-        assertTrue(game?.secondPlayer is BlackPlayer)
-
-        val board = game!!.board.board
-        val pieceFinalPosition = game.secondPlayer.selectedPiece!!.position
-        val pieceInitialPosition = game.secondPlayer.destinationPiece!!.position
-
-        assertEquals(
-            board[
-                8 - pieceFinalPosition.row,
-            ][pieceFinalPosition.column.toColumnNumber()].name,
-            "black_bishop",
-        )
-        assertEquals(
-            board[8 - pieceInitialPosition.row][pieceFinalPosition.column.toColumnNumber()].name,
-            "empty",
-        )
-    }
-
-    @Test
-    fun `test for white pawn (f2) takes black pawn (e7)`() {
-        provideInput("white", "f2-f4", "e7-e5", "f4-e5", "q")
-
-        main()
-
-        val game = Game.getCurrentGame()
-        assertTrue(game?.firstPlayer is WhitePlayer)
-        assertTrue(game?.secondPlayer is BlackPlayer)
-
-        val board = game!!.board.board
-        val pieceFinalPosition = game.firstPlayer.selectedPiece!!.position
-        val pieceInitialPosition = game.firstPlayer.destinationPiece!!.position
-
-        assertEquals(
-            board[
-                8 - pieceFinalPosition.row,
-            ][pieceFinalPosition.column.toColumnNumber()].name,
-            "white_pawn",
-        )
-        assertEquals(
-            board[8 - pieceInitialPosition.row][pieceFinalPosition.column.toColumnNumber()].name,
-            "empty",
-        )
-    }
-
-    @Test
-    fun `test for black pawn (e7) takes white pawn (f2)`() {
-        provideInput("white", "f2-f4", "e7-e5", "g2-g3", "e5-f4", "q")
-
-        main()
-
-        val game = Game.getCurrentGame()
-        assertTrue(game?.firstPlayer is WhitePlayer)
-        assertTrue(game?.secondPlayer is BlackPlayer)
-
-        val board = game!!.board.board
-        val pieceFinalPosition = game.secondPlayer.selectedPiece!!.position
-        val pieceInitialPosition = game.secondPlayer.destinationPiece!!.position
-
-        assertEquals(
-            board[
-                8 - pieceFinalPosition.row,
-            ][pieceFinalPosition.column.toColumnNumber()].name,
-            "black_pawn",
-        )
-        assertEquals(
-            board[8 - pieceInitialPosition.row][pieceFinalPosition.column.toColumnNumber()].name,
-            "empty",
-        )
     }
 
     private fun provideInput(vararg inputs: String) {

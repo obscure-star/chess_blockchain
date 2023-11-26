@@ -195,8 +195,8 @@ data class BlackPlayer(
 
         // Check if the piece is found before attempting to update
         if (pieceToUpdate != null) {
+            pieceToUpdate.initialPosition = selectedPiecePosition
             pieceToUpdate.position = destinationPiece.position.copy()
-            destinationPiece.position = selectedPiecePosition
             pieceToUpdate.clearOpenMoves()
         }
     }

@@ -47,6 +47,7 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
         } while (!isCorrectInput || !isMoveValid)
         updatePlayerPieces()
         updateScores()
+        updateDestinationPiece()
         updateBoard()
         board.printBoard()
         // switch current player
@@ -87,6 +88,7 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
 
     private fun updateScores() {
         if (currentPlayer.destinationPiece?.name?.contains(otherPlayer.name) == true) {
+            otherPlayer.setLostPieces(currentPlayer.destinationPiece)
             currentPlayer.setWonPieces()
             currentPlayer.updatePlayerPoints()
             fancyPrintln(
@@ -94,10 +96,14 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
                     "${currentPlayer.destinationPiece?.pieceType?.point} point. " +
                     "Total point is ${currentPlayer.playerPoints}",
             )
-            otherPlayer.setLostPieces(currentPlayer.destinationPiece)
-            // update destination piece to empty
-            currentPlayer.destinationPiece?.makeEmpty()
         }
+    }
+
+    private fun updateDestinationPiece()  {
+        // update destination piece to empty
+        currentPlayer.destinationPiece?.makeEmpty()
+        // update destination piece location
+        currentPlayer.selectedPiece?.let { currentPlayer.destinationPiece?.updatePosition(it.initialPosition) }
     }
 
     private fun updateBoard() {

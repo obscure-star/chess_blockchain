@@ -26,6 +26,10 @@ data class Bishop(
 
             while (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {
                 validPositions.add(Position(newRow, col.toColumn()))
+                if (otherPlayerPiecePositions.contains("${col.toColumn()}$newRow"))
+                    {
+                        break
+                    }
                 col += colOffset
                 newRow += rowMultiplier * colOffset
             }
