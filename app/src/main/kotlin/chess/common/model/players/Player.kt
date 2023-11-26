@@ -1,15 +1,17 @@
 package chess.common.model.players
 
 import chess.common.model.Piece
+import chess.common.model.Position
 
 interface Player {
     val name: String
-    var playerPoints: Int
+    val playerPoints: Int
     val ownPieces: Set<Piece>
     val wonPieces: Set<Piece>
     val lostPieces: Set<Piece>
     val selectedPiece: Piece?
     val destinationPiece: Piece?
+    val allOpenMoves: List<Position>
     var isChecked: Boolean
 
     fun defaultPieces(): List<List<Piece>>
@@ -20,6 +22,8 @@ interface Player {
         selectedPiece: Piece?,
         destinationPiece: Piece?,
     )
+
+    fun updateAllOpenMoves(otherPlayerPiecePositions: List<String>)
 
     fun setSelectedPiece(piece: Piece): Boolean
 

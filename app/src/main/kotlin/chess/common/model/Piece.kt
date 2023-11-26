@@ -4,12 +4,11 @@ import chess.common.model.pieceTypes.Empty
 import chess.common.model.pieceTypes.PieceType
 
 data class Piece(
-    var name: String?,
+    var name: String? = "empty",
     var pieceType: PieceType = Empty(),
     var initialPosition: Position = Position(1, "a"),
     var position: Position = Position(1, "a"),
     var openMoves: Set<Position> = emptySet(),
-    var restrictedMoves: Set<Position> = emptySet(),
     var canCheck: Boolean = false,
 ) {
     fun setOpenMoves(
@@ -27,7 +26,6 @@ data class Piece(
         name = "empty"
         pieceType = Empty()
         openMoves = emptySet()
-        restrictedMoves = emptySet()
     }
 
     fun updatePosition(newPosition: Position) {

@@ -56,7 +56,7 @@ data class Pawn(
         addIfValid(1, 1)
         addIfValid(-1, 1)
 
-        fancyPrintln("These are the valid positions: $validPositions")
+        // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
 

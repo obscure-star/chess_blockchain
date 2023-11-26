@@ -50,7 +50,7 @@ data class Rook(
             }
         }
 
-        fancyPrintln("These are the valid positions: $validPositions")
+        // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
 

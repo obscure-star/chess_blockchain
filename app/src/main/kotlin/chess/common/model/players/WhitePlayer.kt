@@ -18,6 +18,7 @@ data class WhitePlayer(
     override var lostPieces: Set<Piece> = emptySet(),
     override var selectedPiece: Piece? = null,
     override var destinationPiece: Piece? = null,
+    override var allOpenMoves: List<Position> = emptyList(),
     override var isChecked: Boolean = false,
 ) : Player {
     override fun defaultPieces(): MutableList<MutableList<Piece>> {
@@ -202,6 +203,13 @@ data class WhitePlayer(
         }
     }
 
+    override fun updateAllOpenMoves(otherPlayerPiecePositions: List<String>) {
+        for (piece in ownPieces) {
+            piece.setOpenMoves(ownPiecePositions(), otherPlayerPiecePositions)
+            allOpenMoves = allOpenMoves + piece.openMoves
+        }
+    }
+
     override fun setSelectedPiece(piece: Piece): Boolean {
         if (ownPiecePositions().any { it == piece.position.toString() || it == piece.position.toString() + "k" }) {
             selectedPiece = piece
@@ -216,7 +224,6 @@ data class WhitePlayer(
         otherPlayerPiecePositions: List<String>,
     ): Boolean {
         val selectedPiece = selectedPiece ?: return false
-        selectedPiece.setOpenMoves(ownPiecePositions(), otherPlayerPiecePositions)
         if (selectedPiece.openMoves.any { position -> position.toString() == piece.position.toString() }) {
             destinationPiece = piece
             return true
@@ -232,7 +239,7 @@ data class WhitePlayer(
     override fun setLostPieces(destinationPiece: Piece?) {
         if (destinationPiece != null) {
             if (destinationPiece.name != "empty") {
-                ownPieces = ownPieces.minus(destinationPiece)
+                ownPieces = ownPieces.minus(ownPieces.find { it.position == destinationPiece.position } ?: Piece())
                 lostPieces = lostPieces.plus(destinationPiece.copy())
             }
         }

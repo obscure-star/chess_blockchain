@@ -45,6 +45,7 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
                 fancyPrintln("Please enter a valid move like (e2-e4)")
             }
         } while (!isCorrectInput || !isMoveValid)
+        fancyPrintln("selected piece open moves: ${currentPlayer.selectedPiece?.openMoves}")
         updatePlayerPieces()
         updateScores()
         updateDestinationPiece()
@@ -78,7 +79,8 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
             } ?: return false.also {
                 fancyPrintln("$selectedPosition is an invalid destination")
             }
-
+        currentPlayer.updateAllOpenMoves(otherPlayer.ownPiecePositions())
+        otherPlayer.updateAllOpenMoves(currentPlayer.ownPiecePositions())
         return currentPlayer.setSelectedPiece(selectedPiece) &&
             currentPlayer.setDestinationPiece(destinationPiece, otherPlayer.ownPiecePositions())
     }
