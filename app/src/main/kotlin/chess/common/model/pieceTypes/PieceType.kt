@@ -1,6 +1,5 @@
 package chess.common.model.pieceTypes
 
-import chess.common.model.Piece
 import chess.common.model.Position
 
 interface PieceType {
@@ -11,6 +10,6 @@ interface PieceType {
     fun movePattern(
         position: Position,
         playerPiecePositions: List<String>,
-        otherPlayerPiecePositions: List<String>
+        otherPlayerPiecePositions: List<String>,
     ): Set<Position>
 }

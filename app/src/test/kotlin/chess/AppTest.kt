@@ -49,11 +49,16 @@ class AppTest {
         val blackPieceFinalPosition = game.secondPlayer.selectedPiece!!.position
         val blackPieceInitialPosition = game.secondPlayer.destinationPiece!!.position
 
-        assertEquals(board[
-                8-blackPieceFinalPosition.row][blackPieceFinalPosition.column.toColumnNumber()].name,
-                "black_bishop")
-        assertEquals(board[8-blackPieceInitialPosition.row][blackPieceFinalPosition.column.toColumnNumber()].name,
-            "empty")
+        assertEquals(
+            board[
+                8 - blackPieceFinalPosition.row,
+            ][blackPieceFinalPosition.column.toColumnNumber()].name,
+            "black_bishop",
+        )
+        assertEquals(
+            board[8 - blackPieceInitialPosition.row][blackPieceFinalPosition.column.toColumnNumber()].name,
+            "empty",
+        )
     }
 
     @Test
@@ -70,11 +75,16 @@ class AppTest {
         val whitePieceFinalPosition = game.firstPlayer.selectedPiece!!.position
         val whitePieceInitialPosition = game.secondPlayer.destinationPiece!!.position
 
-        assertEquals(board[
-            8-whitePieceFinalPosition.row][whitePieceFinalPosition.column.toColumnNumber()].name,
-            "white_pawn")
-        assertEquals(board[8-whitePieceInitialPosition.row][whitePieceFinalPosition.column.toColumnNumber()].name,
-            "empty")
+        assertEquals(
+            board[
+                8 - whitePieceFinalPosition.row,
+            ][whitePieceFinalPosition.column.toColumnNumber()].name,
+            "white_pawn",
+        )
+        assertEquals(
+            board[8 - whitePieceInitialPosition.row][whitePieceFinalPosition.column.toColumnNumber()].name,
+            "empty",
+        )
     }
 
     // Helper method to provide input for testing

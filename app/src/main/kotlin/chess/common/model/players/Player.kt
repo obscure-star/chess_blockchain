@@ -22,7 +22,10 @@ interface Player {
 
     fun setSelectedPiece(piece: Piece): Boolean
 
-    fun setDestinationPiece(piece: Piece, otherPlayerPiecePositions: List<String>): Boolean
+    fun setDestinationPiece(
+        piece: Piece,
+        otherPlayerPiecePositions: List<String>,
+    ): Boolean
 
     fun setWonPieces()
 

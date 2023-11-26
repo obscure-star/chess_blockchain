@@ -210,7 +210,10 @@ data class BlackPlayer(
         return false
     }
 
-    override fun setDestinationPiece(piece: Piece, otherPlayerPiecePositions: List<String>): Boolean {
+    override fun setDestinationPiece(
+        piece: Piece,
+        otherPlayerPiecePositions: List<String>,
+    ): Boolean {
         val selectedPiece = selectedPiece ?: return false
         selectedPiece.setOpenMoves(ownPiecePositions(), otherPlayerPiecePositions)
         if (selectedPiece.openMoves.any { position -> position.toString() == piece.position.toString() }) {

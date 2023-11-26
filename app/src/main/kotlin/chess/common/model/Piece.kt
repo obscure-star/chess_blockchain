@@ -10,7 +10,10 @@ data class Piece(
     var openMoves: Set<Position> = emptySet(),
     var restrictedMoves: Set<Position> = emptySet(),
 ) {
-    fun setOpenMoves(playerPiecePositions: List<String>, otherPlayerPiecePositions: List<String>) {
+    fun setOpenMoves(
+        playerPiecePositions: List<String>,
+        otherPlayerPiecePositions: List<String>,
+    ) {
         openMoves = pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions)
     }
 
