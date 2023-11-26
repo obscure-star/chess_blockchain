@@ -1,9 +1,11 @@
 package chess.common.model.pieceTypes
 
+import chess.common.model.Piece
 import chess.common.model.Position
 import chess.fancyPrintln
 import chess.toColumn
 import chess.toColumnNumber
+import kotlin.math.abs
 
 data class Pawn(
     override val name: String = "pawn",
@@ -13,6 +15,7 @@ data class Pawn(
     override fun movePattern(
         position: Position,
         playerPiecePositions: List<String>,
+        otherPlayerPiecePositions: List<String>
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
@@ -20,11 +23,13 @@ data class Pawn(
             colOffset: Int,
             rowOffset: Int,
         ) {
-            val col = position.column.toColumnNumber() + colOffset
+            val col = position.column.toColumnNumber() + colOffset + 1
             val newRow = position.row + rowOffset
 
-            if (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {
-                validPositions.add(Position(newRow, (col + 1).toColumn()))
+            if (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")
+                && ((abs(colOffset) == abs(rowOffset) && otherPlayerPiecePositions.contains("${col.toColumn()}$newRow"))
+                        || abs(colOffset) != abs(rowOffset))) {
+                validPositions.add(Position(newRow, col.toColumn()))
             }
         }
 
@@ -36,10 +41,9 @@ data class Pawn(
             addIfValid(0, 2)
         }
 
-        //  TODO("Add opponents pieces too")
         // Pawn captures diagonally
-        // addIfValid(1, 1)
-        // addIfValid(-1, 1)
+        addIfValid(1, 1)
+        addIfValid(-1, 1)
 
         fancyPrintln("These are the valid positions: $validPositions")
         return validPositions

@@ -36,21 +36,45 @@ class AppTest {
     }
 
     @Test
-    fun `test for black bishop (b4) takes pawn (d2)`() {
+    fun `test for black bishop (b4) takes white pawn (d2)`() {
         provideInput("white", "e2-e4", "e7-e6", "f1-b5", "f8-b4", "b5-d7", "b4-d2", "q")
 
         main()
 
-        // Assert that a game with WhitePlayer and BlackPlayer is created
-        // You need to have appropriate methods in the Game class to check the players
         val game = Game.getCurrentGame()
         assertTrue(game?.firstPlayer is WhitePlayer)
         assertTrue(game?.secondPlayer is BlackPlayer)
-        val board = game?.board?.board
-        if (board != null) {
-            assertEquals(board[6][3].name, "black_bishop")
-            assertEquals(board[1][4].name, "empty")
-        }
+
+        val board = game!!.board.board
+        val blackPieceFinalPosition = game.secondPlayer.selectedPiece!!.position
+        val blackPieceInitialPosition = game.secondPlayer.destinationPiece!!.position
+
+        assertEquals(board[
+                8-blackPieceFinalPosition.row][blackPieceFinalPosition.column.toColumnNumber()].name,
+                "black_bishop")
+        assertEquals(board[8-blackPieceInitialPosition.row][blackPieceFinalPosition.column.toColumnNumber()].name,
+            "empty")
+    }
+
+    @Test
+    fun `test for white pawn (f2) takes black pawn (e7)`() {
+        provideInput("white", "f2-f4", "e7-e5", "f4-e5", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+        val whitePieceFinalPosition = game.firstPlayer.selectedPiece!!.position
+        val whitePieceInitialPosition = game.secondPlayer.destinationPiece!!.position
+
+        assertEquals(board[
+            8-whitePieceFinalPosition.row][whitePieceFinalPosition.column.toColumnNumber()].name,
+            "white_pawn")
+        assertEquals(board[8-whitePieceInitialPosition.row][whitePieceFinalPosition.column.toColumnNumber()].name,
+            "empty")
     }
 
     // Helper method to provide input for testing

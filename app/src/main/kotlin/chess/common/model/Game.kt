@@ -77,7 +77,7 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
                 fancyPrintln("$selectedPosition is an invalid destination")
             }
 
-        return currentPlayer.setSelectedPiece(selectedPiece) && currentPlayer.setDestinationPiece(destinationPiece)
+        return currentPlayer.setSelectedPiece(selectedPiece) && currentPlayer.setDestinationPiece(destinationPiece, otherPlayer.ownPiecePositions())
     }
 
     private fun updatePlayerPieces() {

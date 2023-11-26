@@ -22,11 +22,13 @@ interface Player {
 
     fun setSelectedPiece(piece: Piece): Boolean
 
-    fun setDestinationPiece(piece: Piece): Boolean
+    fun setDestinationPiece(piece: Piece, otherPlayerPiecePositions: List<String>): Boolean
 
     fun setWonPieces()
 
     fun setLostPieces(destinationPiece: Piece?)
 
     fun updatePlayerPoints()
+
+    fun ownPiecePositions(): List<String>
 }

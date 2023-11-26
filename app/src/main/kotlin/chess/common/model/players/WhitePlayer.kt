@@ -210,10 +210,10 @@ data class WhitePlayer(
         return false
     }
 
-    override fun setDestinationPiece(piece: Piece): Boolean {
+    override fun setDestinationPiece(piece: Piece, otherPlayerPiecePositions: List<String>): Boolean {
         val selectedPiece = selectedPiece ?: return false
-        selectedPiece.setOpenMoves(ownPiecePositions())
-        if (selectedPiece.openMoves.any { position -> position.toString() == piece.position.toString() }) {
+        selectedPiece.setOpenMoves(ownPiecePositions(), otherPlayerPiecePositions)
+        if (selectedPiece.openMoves.any { position -> position.toString() == piece.position.toString()}) {
             destinationPiece = piece
             return true
         }
@@ -238,7 +238,7 @@ data class WhitePlayer(
         playerPoints = playerPoints.plus(destinationPiece?.pieceType?.point ?: 0)
     }
 
-    private fun ownPiecePositions(): List<String> {
+    override fun ownPiecePositions(): List<String> {
         return ownPieces.map { it.position.toString() }
     }
 }
