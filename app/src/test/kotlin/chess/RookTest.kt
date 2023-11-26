@@ -21,7 +21,7 @@ class RookTest {
     }
 
     @Test
-    fun `white rook (h2) takes black pawn (h6)`()  {
+    fun `white rook (h2) takes black pawn (h6)`() {
         provideInput("white", "h2-h4", "g7-g5", "h4-g5", "h7-h6", "h1-h6", "q")
 
         main()
@@ -47,7 +47,7 @@ class RookTest {
     }
 
     @Test
-    fun `white rook (h2) can't go passed black pawn (h6)`()  {
+    fun `white rook (h2) can't go passed black pawn (h6)`() {
         provideInput("white", "h2-h4", "g7-g5", "h4-g5", "h7-h6", "h1-h8", "q")
 
         main()

@@ -99,7 +99,7 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
         }
     }
 
-    private fun updateDestinationPiece()  {
+    private fun updateDestinationPiece() {
         // update destination piece to empty
         currentPlayer.destinationPiece?.makeEmpty()
         // update destination piece location

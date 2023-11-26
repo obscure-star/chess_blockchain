@@ -21,7 +21,7 @@ class QueenTest {
     }
 
     @Test
-    fun `white queen (e2) takes black pawn (e6)`()  {
+    fun `white queen (e2) takes black pawn (e6)`() {
         provideInput("white", "e2-e4", "e7-e6", "d1-g4", "f8-d6", "g4-e6", "q")
 
         main()
@@ -47,7 +47,7 @@ class QueenTest {
     }
 
     @Test
-    fun `white queen (e2) can't go passed black pawn (e6)`()  {
+    fun `white queen (e2) can't go passed black pawn (e6)`() {
         provideInput("white", "e2-e4", "e7-e6", "d1-g4", "f8-d6", "g4-d7", "q")
 
         main()

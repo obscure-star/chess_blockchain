@@ -29,7 +29,7 @@ data class Piece(
         restrictedMoves = emptySet()
     }
 
-    fun updatePosition(newPosition: Position)  {
+    fun updatePosition(newPosition: Position) {
         position = newPosition
     }
 }

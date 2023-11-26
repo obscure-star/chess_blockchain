@@ -20,7 +20,7 @@ class KingTest {
     }
 
     @Test
-    fun `white king (e1) takes black knight (f2)`()  {
+    fun `white king (e1) takes black knight (f2)`() {
         provideInput("white", "e2-e4", "g8-f6", "c2-c4", "f6-e4", "d1-a4", "e4-f2", "e1-f2", "q")
 
         main()
