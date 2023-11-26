@@ -4,6 +4,7 @@ import chess.common.model.Position
 import chess.fancyPrintln
 import chess.toColumn
 import chess.toColumnNumber
+import kotlin.math.abs
 
 data class BlackPawn(
     override val name: String = "black_pawn",
@@ -21,11 +22,16 @@ data class BlackPawn(
             colOffset: Int,
             rowOffset: Int,
         ) {
-            val col = position.column.toColumnNumber() + colOffset
+            val col = position.column.toColumnNumber() + colOffset + 1
             val newRow = position.row + rowOffset
 
-            if (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow")) {
-                validPositions.add(Position(newRow, (col + 1).toColumn()))
+            if (col in 1..8 && newRow in 1..8 && !playerPiecePositions.contains("${col.toColumn()}$newRow") &&
+                (
+                    (abs(colOffset) == abs(rowOffset) && otherPlayerPiecePositions.contains("${col.toColumn()}$newRow")) ||
+                        abs(colOffset) != abs(rowOffset)
+                )
+            ) {
+                validPositions.add(Position(newRow, col.toColumn()))
             }
         }
 
@@ -37,10 +43,9 @@ data class BlackPawn(
             addIfValid(0, -2)
         }
 
-        //  TODO("Add opponents pieces too")
         // Pawn captures diagonally
-        // addIfValid(1, 1)
-        // addIfValid(-1, 1)
+        addIfValid(-1, -1)
+        addIfValid(1, -1)
 
         fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
