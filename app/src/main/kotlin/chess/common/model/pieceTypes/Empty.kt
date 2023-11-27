@@ -11,15 +11,8 @@ data class Empty(
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
     ): Set<Position> {
         return emptySet()
-    }
-
-    override fun canCheck(
-        newCol: Int,
-        newRow: Int,
-        otherPlayerPiecePositions: List<String>,
-    ): Boolean {
-        return false
     }
 }

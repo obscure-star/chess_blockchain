@@ -11,11 +11,6 @@ interface PieceType {
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
     ): Set<Position>
-
-    fun canCheck(
-        newCol: Int,
-        newRow: Int,
-        otherPlayerPiecePositions: List<String>,
-    ): Boolean
 }

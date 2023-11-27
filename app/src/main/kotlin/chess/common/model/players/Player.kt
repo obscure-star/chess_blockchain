@@ -12,7 +12,10 @@ interface Player {
     val selectedPiece: Piece?
     val destinationPiece: Piece?
     val allOpenMoves: List<Position>
-    var isChecked: Boolean
+
+    fun saveState(): Player
+
+    fun restoreState(savedState: Player)
 
     fun defaultPieces(): List<List<Piece>>
 
@@ -23,14 +26,19 @@ interface Player {
         destinationPiece: Piece?,
     )
 
-    fun updateAllOpenMoves(otherPlayerPiecePositions: List<String>)
+    fun updateAllOpenMoves(
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
+    )
+
+    fun getInstanceAllOpenMoves(
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
+    ): List<Position>
 
     fun setSelectedPiece(piece: Piece): Boolean
 
-    fun setDestinationPiece(
-        piece: Piece,
-        otherPlayerPiecePositions: List<String>,
-    ): Boolean
+    fun setDestinationPiece(piece: Piece): Boolean
 
     fun setWonPieces()
 
@@ -38,9 +46,5 @@ interface Player {
 
     fun updatePlayerPoints()
 
-    fun ownPiecePositions(): List<String>
-
-    fun setCheck()
-
-    fun unCheck()
+    fun getOwnPiecePositions(): List<String>
 }

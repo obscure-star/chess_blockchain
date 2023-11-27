@@ -1,7 +1,6 @@
 package chess.common.model.pieceTypes
 
 import chess.common.model.Position
-import chess.fancyPrintln
 import chess.toColumn
 import chess.toColumnNumber
 import kotlin.math.abs
@@ -15,6 +14,7 @@ data class BlackPawn(
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
@@ -37,13 +37,9 @@ data class BlackPawn(
                 if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow") &&
                     (
                         isKill(newCol, newRow, colOffset, rowOffset) || abs(colOffset) != abs(rowOffset)
-                    ) && !canCheck(newCol, newRow, otherPlayerPiecePositions)
+                    )
                 ) {
                     validPositions.add(Position(newRow, newCol.toColumn()))
-                }
-
-                if (canCheck(newCol, newRow, otherPlayerPiecePositions)) {
-                    // do something
                 }
             }
         }
@@ -62,17 +58,5 @@ data class BlackPawn(
 
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
-    }
-
-    override fun canCheck(
-        newCol: Int,
-        newRow: Int,
-        otherPlayerPiecePositions: List<String>,
-    ): Boolean {
-        return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
-            if (it) {
-                fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
-            }
-        }
     }
 }

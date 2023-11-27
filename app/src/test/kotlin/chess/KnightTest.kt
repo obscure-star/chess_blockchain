@@ -46,8 +46,8 @@ class KnightTest {
     }
 
     @Test
-    fun `white knight (b1) can't get to black king (e8)`() {
-        provideInput("white", "b1-c3", "d7-d5", "c3-d5", "d5-c7", "b7-b5", "d5-c7", "b5-b4", "c7-e8", "q")
+    fun `white knight (b1) checks can't get to black king (e8)`() {
+        provideInput("white", "b1-c3", "d7-d5", "c3-d5", "b7-b5", "d5-c7", "b5-b4", "c7-e8", "q")
 
         main()
 

@@ -60,8 +60,8 @@ class QueenTest {
     }
 
     @Test
-    fun `test for white queen (d1) can't take black king (e8)`() {
-        provideInput("white", "e2-e4", "e7-e5", "d1-h5", "f7-f5", "h5-e8", "h5-f7", "q")
+    fun `white queen (d1) can't take black king (e8)`() {
+        provideInput("white", "e2-e4", "e7-e5", "d1-h5", "f7-f5", "g7-g6", "q")
 
         main()
 

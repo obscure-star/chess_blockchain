@@ -20,7 +20,7 @@ class BishopTest {
     }
 
     @Test
-    fun `test for black bishop (b4) takes white pawn (d2)`() {
+    fun `test for white bishop (b4) takes black pawn (d2)`() {
         provideInput("white", "e2-e4", "e7-e6", "f1-b5", "f8-b4", "b5-d7", "b4-d2", "q")
 
         main()
@@ -30,11 +30,11 @@ class BishopTest {
         Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
 
         val board = game!!.board.board
-        val pieceFinalPosition = game.secondPlayer.selectedPiece!!.position
-        val pieceInitialPosition = game.secondPlayer.destinationPiece!!.position
+        val pieceFinalPosition = game.firstPlayer.selectedPiece!!.position
+        val pieceInitialPosition = game.firstPlayer.destinationPiece!!.position
 
         assertEquals(
-            "black_bishop",
+            "white_bishop",
             board[
                 8 - pieceFinalPosition.row,
             ][pieceFinalPosition.column.toColumnNumber()].name,
@@ -65,7 +65,7 @@ class BishopTest {
 
     @Test
     fun `test for black bishop (b4) can't get to king (e1)`() {
-        provideInput("white", "e2-e4", "e7-e6", "f1-b5", "f8-b4", "b5-d7", "b4-d2", "d7-c8", "d2-e1", "q")
+        provideInput("white", "e2-e4", "e7-e6", "f1-b5", "f8-b4", "b5-d7", "e8-e7", "q")
 
         main()
 

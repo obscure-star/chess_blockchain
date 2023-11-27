@@ -11,16 +11,39 @@ import chess.common.model.pieceTypes.Rook
 import chess.fancyPrintln
 
 data class WhitePlayer(
-    override val name: String,
+    override val name: String = "white",
     override var playerPoints: Int = 0,
-    override var ownPieces: Set<Piece> = emptySet(),
-    override var wonPieces: Set<Piece> = emptySet(),
-    override var lostPieces: Set<Piece> = emptySet(),
+    override var ownPieces: Set<Piece> = mutableSetOf(),
+    override var wonPieces: Set<Piece> = mutableSetOf(),
+    override var lostPieces: Set<Piece> = mutableSetOf(),
     override var selectedPiece: Piece? = null,
     override var destinationPiece: Piece? = null,
-    override var allOpenMoves: List<Position> = emptyList(),
-    override var isChecked: Boolean = false,
+    override var allOpenMoves: List<Position> = mutableListOf(),
 ) : Player {
+    override fun saveState(): Player {
+        // Create a new instance with the same state
+        return BlackPlayer(
+            name,
+            playerPoints,
+            ownPieces.map { it.copy() }.toSet(),
+            wonPieces.map { it.copy() }.toSet(),
+            lostPieces.map { it.copy() }.toSet(),
+            selectedPiece?.copy(),
+            destinationPiece?.copy(),
+            allOpenMoves.map { it.copy() }.toList(),
+        )
+    }
+
+    override fun restoreState(savedState: Player) {
+        playerPoints = savedState.playerPoints
+        ownPieces = savedState.ownPieces.map { it.copy() }.toSet()
+        wonPieces = savedState.wonPieces.map { it.copy() }.toSet()
+        lostPieces = savedState.lostPieces.map { it.copy() }.toSet()
+        selectedPiece = savedState.selectedPiece?.copy()
+        destinationPiece = savedState.destinationPiece?.copy()
+        allOpenMoves = savedState.allOpenMoves.map { it.copy() }.toList()
+    }
+
     override fun defaultPieces(): MutableList<MutableList<Piece>> {
         return mutableListOf(
             mutableListOf(
@@ -203,31 +226,46 @@ data class WhitePlayer(
         }
     }
 
-    override fun updateAllOpenMoves(otherPlayerPiecePositions: List<String>) {
+    override fun updateAllOpenMoves(
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
+    ) {
+        allOpenMoves = emptyList()
         for (piece in ownPieces) {
-            piece.setOpenMoves(ownPiecePositions(), otherPlayerPiecePositions)
-            allOpenMoves = allOpenMoves + piece.openMoves
+            piece.setOpenMoves(getOwnPiecePositions(), otherPlayerPiecePositions, otherPlayerAllOpenPieces)
+            allOpenMoves = allOpenMoves.union(piece.openMoves).toList()
         }
     }
 
+    override fun getInstanceAllOpenMoves(
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
+    ): List<Position> {
+        var allOpenMoves: List<Position> = emptyList()
+        for (piece in ownPieces) {
+            val openMoves = piece.getInstanceOpenMoves(getOwnPiecePositions(), otherPlayerPiecePositions, otherPlayerAllOpenPieces)
+            allOpenMoves = allOpenMoves.union(openMoves).toList()
+        }
+        return allOpenMoves
+    }
+
     override fun setSelectedPiece(piece: Piece): Boolean {
-        if (ownPiecePositions().any { it == piece.position.toString() || it == piece.position.toString() + "k" }) {
+        if (getOwnPiecePositions().any { it == piece.position.toString() || it == piece.position.toString() + "k" }) {
             selectedPiece = piece
             return true
         }
         selectedPiece = null
+        fancyPrintln("${piece.position} is not your piece.")
         return false
     }
 
-    override fun setDestinationPiece(
-        piece: Piece,
-        otherPlayerPiecePositions: List<String>,
-    ): Boolean {
+    override fun setDestinationPiece(piece: Piece): Boolean {
         val selectedPiece = selectedPiece ?: return false
         if (selectedPiece.openMoves.any { position -> position.toString() == piece.position.toString() }) {
             destinationPiece = piece
             return true
         }
+        fancyPrintln("${piece.position} is not a valid move.")
         destinationPiece = null
         return false
     }
@@ -249,20 +287,9 @@ data class WhitePlayer(
         playerPoints = playerPoints.plus(destinationPiece?.pieceType?.point ?: 0)
     }
 
-    override fun ownPiecePositions(): List<String> {
+    override fun getOwnPiecePositions(): List<String> {
         return ownPieces.map { piece: Piece ->
-            if (piece.name?.contains("king") == true) {
-                piece.position.toString() + "k"
-            } else {
-                piece.position.toString()
-            }
+            piece.position.toString()
         }
-    }
-
-    override fun setCheck() {
-        TODO("Not yet implemented")
-    }
-
-    override fun unCheck() {
     }
 }

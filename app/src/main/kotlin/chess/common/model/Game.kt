@@ -4,7 +4,10 @@ import chess.checkExitGame
 import chess.common.model.players.Player
 import chess.fancyPrintln
 
-class Game private constructor(val firstPlayer: Player, val secondPlayer: Player) {
+class Game private constructor(
+    val firstPlayer: Player,
+    val secondPlayer: Player,
+) {
     private var currentPlayer: Player
     private var otherPlayer: Player
     val board = Board()
@@ -15,7 +18,7 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
             otherPlayer = secondPlayer
         } else {
             currentPlayer = secondPlayer
-            otherPlayer = secondPlayer
+            otherPlayer = firstPlayer
         }
         board.buildBoard()
         firstPlayer.setOwnPieces()
@@ -30,6 +33,8 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
     }
 
     private fun playerAction(): Boolean {
+        val currentPlayerState = currentPlayer.saveState()
+        val otherPlayerState = otherPlayer.saveState()
         do {
             fancyPrintln("Please enter your move (example: e2-e4): ")
             val move = readlnOrNull()
@@ -45,10 +50,22 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
                 fancyPrintln("Please enter a valid move like (e2-e4)")
             }
         } while (!isCorrectInput || !isMoveValid)
-        fancyPrintln("selected piece open moves: ${currentPlayer.selectedPiece?.openMoves}")
+        if (isCheck()) {
+            return true
+        }
+        fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
         updatePlayerPieces()
         updateScores()
         updateDestinationPiece()
+        if (leadsToCheck()) {
+            currentPlayer.restoreState(currentPlayerState)
+            otherPlayer.restoreState(otherPlayerState)
+            return true
+        }
+        fancyPrintln(
+            "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
+                "to ${currentPlayer.selectedPiece?.position} has been played.",
+        )
         updateBoard()
         board.printBoard()
 
@@ -79,10 +96,44 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
             } ?: return false.also {
                 fancyPrintln("$selectedPosition is an invalid destination")
             }
-        currentPlayer.updateAllOpenMoves(otherPlayer.ownPiecePositions())
-        otherPlayer.updateAllOpenMoves(currentPlayer.ownPiecePositions())
+        otherPlayer.updateAllOpenMoves(currentPlayer.getOwnPiecePositions(), currentPlayer.allOpenMoves)
+        currentPlayer.updateAllOpenMoves(otherPlayer.getOwnPiecePositions(), otherPlayer.allOpenMoves)
         return currentPlayer.setSelectedPiece(selectedPiece) &&
-            currentPlayer.setDestinationPiece(destinationPiece, otherPlayer.ownPiecePositions())
+            currentPlayer.setDestinationPiece(destinationPiece)
+    }
+
+    private fun isCheck(): Boolean {
+        val selectedPiece = currentPlayer.selectedPiece
+        if (selectedPiece?.name?.contains("king") == true) {
+            return false
+        }
+        val kingPosition =
+            currentPlayer.ownPieces.find {
+                    piece: Piece ->
+                piece.pieceType.name.contains("king")
+            }?.position
+        return otherPlayer.allOpenMoves.contains(
+            kingPosition,
+        ).also {
+            if (it) fancyPrintln("You are currently checked. Please move your king at $kingPosition")
+        }
+    }
+
+    private fun leadsToCheck(): Boolean {
+        val selectedPiece = currentPlayer.selectedPiece
+        if (selectedPiece?.name?.contains("king") == true) {
+            return false
+        }
+        val kingPosition =
+            currentPlayer.ownPieces.find {
+                    piece: Piece ->
+                piece.pieceType.name.contains("king")
+            }?.position
+        return otherPlayer.getInstanceAllOpenMoves(currentPlayer.getOwnPiecePositions(), currentPlayer.allOpenMoves).contains(
+            kingPosition,
+        ).also {
+            if (it) fancyPrintln("You will be checked. Please protect your king at $kingPosition")
+        }
     }
 
     private fun updatePlayerPieces() {
@@ -110,10 +161,6 @@ class Game private constructor(val firstPlayer: Player, val secondPlayer: Player
     }
 
     private fun updateBoard() {
-        fancyPrintln(
-            "${currentPlayer.selectedPiece?.name} ${currentPlayer.selectedPiece?.position} " +
-                "to ${currentPlayer.destinationPiece?.position} has been played.",
-        )
         fancyPrintln("Updating board.")
         board.swapPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
     }

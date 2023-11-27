@@ -73,7 +73,7 @@ class RookTest {
 
         assertEquals(
             "black_king",
-            board[1]["e".toColumnNumber()].name,
+            board[0]["e".toColumnNumber()].name,
         )
     }
 

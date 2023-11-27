@@ -1,7 +1,6 @@
 package chess.common.model.pieceTypes
 
 import chess.common.model.Position
-import chess.fancyPrintln
 import chess.toColumn
 import chess.toColumnNumber
 
@@ -14,6 +13,7 @@ data class King(
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
@@ -24,11 +24,13 @@ data class King(
             val newCol = position.column.toColumnNumber() + colOffset + 1
             val newRow = position.row + rowOffset
 
-            if (newCol in 1..8 && newRow in 1..8 &&
-                !playerPiecePositions.contains("${newCol.toColumn()}$newRow") &&
-                !canCheck(newCol, newRow, otherPlayerPiecePositions)
-            ) {
-                validPositions.add(Position(newRow, newCol.toColumn()))
+            if (newCol in 1..8 && newRow in 1..8) {
+                val newPosition = Position(newRow, newCol.toColumn())
+                if (!playerPiecePositions.contains(newPosition.toString()) &&
+                    otherPlayerAllOpenPieces.none { it.toString() == newPosition.toString() }
+                ) {
+                    validPositions.add(newPosition)
+                }
             }
         }
 
@@ -52,17 +54,5 @@ data class King(
 
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
-    }
-
-    override fun canCheck(
-        newCol: Int,
-        newRow: Int,
-        otherPlayerPiecePositions: List<String>,
-    ): Boolean {
-        return otherPlayerPiecePositions.contains("${newCol.toColumn()}${newRow}k").also {
-            if (it) {
-                fancyPrintln("Can't kill king at ${newCol.toColumn()}$newRow")
-            }
-        }
     }
 }
