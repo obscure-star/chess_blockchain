@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
+import kotlin.test.assertEquals
 
 class AppTest {
     private val originalIn = System.`in`
@@ -32,6 +33,71 @@ class AppTest {
         val game = Game.getCurrentGame()
         assertTrue(game?.firstPlayer is WhitePlayer)
         assertTrue(game?.secondPlayer is BlackPlayer)
+    }
+
+    @Test
+    fun `white checkmates in 4 moves`() {
+        provideInput("white", "e2-e4", "f7-f5", "e4-f5", "g7-g5", "d1-h5", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        game?.firstPlayer?.let { assertTrue(it.winner) }
+    }
+
+    @Test
+    fun `white checkmates in 3 moves`() {
+        provideInput("white", "f2-f4", "e7-e6", "g2-g4", "d8-h4", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        game?.secondPlayer?.let { assertTrue(it.winner) }
+    }
+
+    @Test
+    fun `black checkmates in 2 moves`() {
+        provideInput("white", "d2-d3", "f7-f6", "e2-e4", "g7-g5", "d1-h5", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        game?.firstPlayer?.let { assertTrue(it.winner) }
+    }
+
+    @Test
+    fun `the queen's gambit`() {
+        provideInput("white", "d2-d4", "d7-d5", "c2-c4", "d5-c4", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+        val pieceFinalPosition = game.secondPlayer.selectedPiece!!.position
+        val pieceInitialPosition = game.secondPlayer.destinationPiece!!.position
+
+        assertEquals(
+            "black_pawn",
+            board[
+                8 - pieceFinalPosition.row,
+            ][pieceFinalPosition.column.toColumnNumber()].name,
+        )
+        assertEquals(
+            "empty",
+            board[8 - pieceInitialPosition.row][pieceInitialPosition.column.toColumnNumber()].name,
+        )
     }
 
     private fun provideInput(vararg inputs: String) {

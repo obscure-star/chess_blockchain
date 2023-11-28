@@ -36,6 +36,15 @@ class Game private constructor(
         val currentPlayerState = currentPlayer.saveState()
         val otherPlayerState = otherPlayer.saveState()
         do {
+            fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
+            fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
+            if (isCheck()) {
+                if (isCheckMate()) {
+                    fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
+                    otherPlayer.setWinner()
+                    return false
+                }
+            }
             fancyPrintln("Please enter your move (example: e2-e4): ")
             val move = readlnOrNull()
             if (checkExitGame(move)) {
@@ -50,9 +59,6 @@ class Game private constructor(
                 fancyPrintln("Please enter a valid move like (e2-e4)")
             }
         } while (!isCorrectInput || !isMoveValid)
-        if (isCheck()) {
-            return true
-        }
         fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
         updatePlayerPieces()
         updateScores()
@@ -66,6 +72,10 @@ class Game private constructor(
             "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
                 "to ${currentPlayer.selectedPiece?.position} has been played.",
         )
+        // update open moves based on currentPlayer's open moves
+        currentPlayer.updateAllOpenMoves(otherPlayer.getOwnPiecePositions(), otherPlayer.allOpenMoves)
+        otherPlayer.updateAllOpenMoves(currentPlayer.getOwnPiecePositions(), currentPlayer.allOpenMoves)
+
         updateBoard()
         board.printBoard()
 
@@ -96,6 +106,7 @@ class Game private constructor(
             } ?: return false.also {
                 fancyPrintln("$selectedPosition is an invalid destination")
             }
+        // update open moves based on otherPlayer's open moves
         otherPlayer.updateAllOpenMoves(currentPlayer.getOwnPiecePositions(), currentPlayer.allOpenMoves)
         currentPlayer.updateAllOpenMoves(otherPlayer.getOwnPiecePositions(), otherPlayer.allOpenMoves)
         return currentPlayer.setSelectedPiece(selectedPiece) &&
@@ -103,10 +114,6 @@ class Game private constructor(
     }
 
     private fun isCheck(): Boolean {
-        val selectedPiece = currentPlayer.selectedPiece
-        if (selectedPiece?.name?.contains("king") == true) {
-            return false
-        }
         val kingPosition =
             currentPlayer.ownPieces.find {
                     piece: Piece ->
@@ -117,6 +124,15 @@ class Game private constructor(
         ).also {
             if (it) fancyPrintln("You are currently checked. Please move your king at $kingPosition")
         }
+    }
+
+    private fun isCheckMate(): Boolean {
+        val kingPiece =
+            currentPlayer.ownPieces.find {
+                    piece: Piece ->
+                piece.pieceType.name.contains("king")
+            }
+        return kingPiece?.openMoves?.isEmpty() ?: false
     }
 
     private fun leadsToCheck(): Boolean {
@@ -146,9 +162,9 @@ class Game private constructor(
             currentPlayer.setWonPieces()
             currentPlayer.updatePlayerPoints()
             fancyPrintln(
-                "${currentPlayer.name} has gained " +
+                "${currentPlayer.name} will gain " +
                     "${currentPlayer.destinationPiece?.pieceType?.point} point. " +
-                    "Total point is ${currentPlayer.playerPoints}",
+                    "Total point will be ${currentPlayer.playerPoints}",
             )
         }
     }

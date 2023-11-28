@@ -22,7 +22,7 @@ class QueenTest {
 
     @Test
     fun `white queen (e2) takes black pawn (e6)`() {
-        provideInput("white", "e2-e4", "e7-e6", "d1-g4", "f8-d6", "g4-e6", "q")
+        provideInput("white", "e2-e4", "e7-e6", "d1-g4", "f8-d6", "g4-e6", "e8-f8", "q")
 
         main()
 
@@ -74,6 +74,32 @@ class QueenTest {
         assertEquals(
             "black_king",
             board[0]["e".toColumnNumber()].name,
+        )
+    }
+
+    @Test
+    fun `white queen (e2) checkmates king (f8)`() {
+        provideInput("white", "e2-e4", "e7-e6", "d1-g4", "f8-d6", "g4-e6", "e8-f8", "e6-e8", "q")
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+        val pieceFinalPosition = game.firstPlayer.selectedPiece!!.position
+        val pieceInitialPosition = game.firstPlayer.destinationPiece!!.position
+
+        assertEquals(
+            "white_queen",
+            board[
+                8 - pieceFinalPosition.row,
+            ][pieceFinalPosition.column.toColumnNumber()].name,
+        )
+        assertEquals(
+            "empty",
+            board[8 - pieceInitialPosition.row][pieceInitialPosition.column.toColumnNumber()].name,
         )
     }
 

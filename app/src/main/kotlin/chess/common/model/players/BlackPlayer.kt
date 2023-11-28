@@ -19,6 +19,7 @@ data class BlackPlayer(
     override var selectedPiece: Piece? = null,
     override var destinationPiece: Piece? = null,
     override var allOpenMoves: List<Position> = emptyList(),
+    override var winner: Boolean = false,
 ) : Player {
     override fun saveState(): Player {
         // Create a new instance with the same state
@@ -291,5 +292,9 @@ data class BlackPlayer(
         return ownPieces.map { piece: Piece ->
             piece.position.toString()
         }
+    }
+
+    override fun setWinner() {
+        winner = true
     }
 }

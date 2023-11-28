@@ -12,6 +12,7 @@ interface Player {
     val selectedPiece: Piece?
     val destinationPiece: Piece?
     val allOpenMoves: List<Position>
+    val winner: Boolean
 
     fun saveState(): Player
 
@@ -47,4 +48,6 @@ interface Player {
     fun updatePlayerPoints()
 
     fun getOwnPiecePositions(): List<String>
+
+    fun setWinner()
 }
