@@ -1,5 +1,6 @@
 package chess.common.model
 
+import chess.Color
 import chess.common.model.pieceTypes.Empty
 import chess.common.model.pieceTypes.PieceType
 
@@ -9,7 +10,7 @@ data class Piece(
     var initialPosition: Position = Position(1, "a"),
     var position: Position = Position(1, "a"),
     var openMoves: Set<Position> = emptySet(),
-    var canCheck: Boolean = false,
+    var color: String = Color.WHITE.code,
 ) {
     fun setOpenMoves(
         playerPiecePositions: List<String>,
@@ -36,6 +37,7 @@ data class Piece(
         name = "empty"
         pieceType = Empty()
         openMoves = emptySet()
+        color = Color.WHITE.code
     }
 
     fun updatePosition(newPosition: Position) {

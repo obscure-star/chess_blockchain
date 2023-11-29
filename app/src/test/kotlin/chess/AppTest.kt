@@ -49,7 +49,7 @@ class AppTest {
     }
 
     @Test
-    fun `white checkmates in 3 moves`() {
+    fun `black checkmates in 3 moves`() {
         provideInput("white", "f2-f4", "e7-e6", "g2-g4", "d8-h4", "q")
 
         main()
@@ -98,6 +98,45 @@ class AppTest {
             "empty",
             board[8 - pieceInitialPosition.row][pieceInitialPosition.column.toColumnNumber()].name,
         )
+    }
+
+    @Test
+    fun `Kasparov vs Topalov, Wijk aan Zee 1999 game play test`() {
+        provideInput(
+            "white",
+            "e2-e4",
+            "d7-d6",
+            "d2-d4",
+            "g8-f6",
+            "b1-c3",
+            "g7-g6",
+            "c1-e3",
+            "f8-g7",
+            "d1-d2",
+            "c7-c6",
+            "f2-f3",
+            "b7-b5",
+            "g1-e2",
+            "b8-d7",
+            "e3-h6",
+            "g7-h6",
+            "d2-h6",
+            "c8-b7",
+            "a2-a3",
+            "e7-e5",
+            // castle here
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+        val pieceFinalPosition = game.secondPlayer.selectedPiece!!.position
+        val pieceInitialPosition = game.secondPlayer.destinationPiece!!.position
     }
 
     private fun provideInput(vararg inputs: String) {

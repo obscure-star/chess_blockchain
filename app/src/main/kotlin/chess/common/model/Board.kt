@@ -1,5 +1,6 @@
 package chess.common.model
 
+import chess.Color
 import chess.common.model.pieceTypes.Empty
 import chess.common.model.players.BlackPlayer
 import chess.common.model.players.WhitePlayer
@@ -36,8 +37,8 @@ class Board {
         println()
         for ((i, row) in board.withIndex()) {
             print(" ${8 - i} | ")
-            for (square in row) {
-                print(square.pieceType.image)
+            for (piece in row) {
+                print("${piece.color}${piece.pieceType.image}${Color.RESET.code}")
             }
             println()
         }

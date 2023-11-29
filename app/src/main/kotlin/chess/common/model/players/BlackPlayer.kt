@@ -1,5 +1,6 @@
 package chess.common.model.players
 
+import chess.Color
 import chess.common.model.Piece
 import chess.common.model.Position
 import chess.common.model.pieceTypes.Bishop
@@ -56,6 +57,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "a",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_knight",
@@ -65,6 +67,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "b",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_bishop",
@@ -74,6 +77,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "c",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_queen",
@@ -83,6 +87,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "d",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_king",
@@ -92,6 +97,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "e",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_bishop",
@@ -101,6 +107,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "f",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_knight",
@@ -110,6 +117,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "g",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_rook",
@@ -119,6 +127,7 @@ data class BlackPlayer(
                             row = 8,
                             column = "h",
                         ),
+                    color = Color.RED.code,
                 ),
             ),
             mutableListOf(
@@ -130,6 +139,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "a",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -139,6 +149,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "b",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -148,6 +159,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "c",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -157,6 +169,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "d",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -166,6 +179,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "e",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -175,6 +189,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "f",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -184,6 +199,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "g",
                         ),
+                    color = Color.RED.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -193,6 +209,7 @@ data class BlackPlayer(
                             row = 7,
                             column = "h",
                         ),
+                    color = Color.RED.code,
                 ),
             ),
         )

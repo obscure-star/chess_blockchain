@@ -1,5 +1,6 @@
 package chess.common.model.players
 
+import chess.Color
 import chess.common.model.Piece
 import chess.common.model.Position
 import chess.common.model.pieceTypes.Bishop
@@ -56,6 +57,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "a",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -65,6 +67,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "b",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -74,6 +77,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "c",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -83,6 +87,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "d",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -92,6 +97,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "e",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -101,6 +107,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "f",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -110,6 +117,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "g",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_pawn",
@@ -119,6 +127,7 @@ data class WhitePlayer(
                             row = 2,
                             column = "h",
                         ),
+                    color = Color.GREEN.code,
                 ),
             ),
             mutableListOf(
@@ -130,6 +139,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "a",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_knight",
@@ -139,6 +149,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "b",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_bishop",
@@ -148,6 +159,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "c",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_queen",
@@ -157,6 +169,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "d",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_king",
@@ -166,6 +179,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "e",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_bishop",
@@ -175,6 +189,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "f",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_knight",
@@ -184,6 +199,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "g",
                         ),
+                    color = Color.GREEN.code,
                 ),
                 Piece(
                     name = "${name}_rook",
@@ -193,6 +209,7 @@ data class WhitePlayer(
                             row = 1,
                             column = "h",
                         ),
+                    color = Color.GREEN.code,
                 ),
             ),
         )
