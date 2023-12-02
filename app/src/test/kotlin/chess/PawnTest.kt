@@ -89,6 +89,178 @@ class PawnTest {
         )
     }
 
+    @Test
+    fun `test promote pawn (f2) to queen (f8)`() {
+        provideInput(
+            "white",
+            "f2-f4",
+            "e7-e5",
+            "g2-g3",
+            "e5-f4",
+            "g3-g4",
+            "f4-f3",
+            "h2-h3",
+            "f3-f2",
+            "e1-f2",
+            "f7-f5",
+            "g4-f5",
+            "f8-c5",
+            "f2-e1",
+            "c5-b4",
+            "f5-f6",
+            "d8-e7",
+            "f6-g7",
+            "h7-h6",
+            "g7-h8",
+            "Q",
+            "e8-f7",
+            "h8-g8",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "white_queen",
+            board[0]["g".toColumnNumber()].name,
+        )
+    }
+
+    @Test
+    fun `test promote pawn (f2) to rook (f8)`() {
+        provideInput(
+            "white",
+            "f2-f4",
+            "e7-e5",
+            "g2-g3",
+            "e5-f4",
+            "g3-g4",
+            "f4-f3",
+            "h2-h3",
+            "f3-f2",
+            "e1-f2",
+            "f7-f5",
+            "g4-f5",
+            "f8-c5",
+            "f2-e1",
+            "c5-b4",
+            "f5-f6",
+            "d8-e7",
+            "f6-g7",
+            "h7-h6",
+            "g7-h8",
+            "R",
+            "e8-f7",
+            "h8-g8",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "white_rook",
+            board[0]["g".toColumnNumber()].name,
+        )
+    }
+
+    @Test
+    fun `test promote pawn (f2) to knight (f8)`() {
+        provideInput(
+            "white",
+            "f2-f4",
+            "e7-e5",
+            "g2-g3",
+            "e5-f4",
+            "g3-g4",
+            "f4-f3",
+            "h2-h3",
+            "f3-f2",
+            "e1-f2",
+            "f7-f5",
+            "g4-f5",
+            "f8-c5",
+            "f2-e1",
+            "c5-b4",
+            "f5-f6",
+            "d8-e7",
+            "f6-g7",
+            "h7-h6",
+            "g7-h8",
+            "N",
+            "e8-f8",
+            "h8-g6",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "white_knight",
+            board[2]["g".toColumnNumber()].name,
+        )
+    }
+
+    @Test
+    fun `test promote pawn (f2) to bishop (f8)`() {
+        provideInput(
+            "white",
+            "f2-f4",
+            "e7-e5",
+            "g2-g3",
+            "e5-f4",
+            "g3-g4",
+            "f4-f3",
+            "h2-h3",
+            "f3-f2",
+            "e1-f2",
+            "f7-f5",
+            "g4-f5",
+            "f8-c5",
+            "f2-e1",
+            "c5-b4",
+            "f5-f6",
+            "d8-e7",
+            "f6-g7",
+            "h7-h6",
+            "g7-h8",
+            "B",
+            "e8-f8",
+            "h8-g7",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "white_bishop",
+            board[1]["g".toColumnNumber()].name,
+        )
+    }
+
     private fun provideInput(vararg inputs: String) {
         System.setIn(ByteArrayInputStream(inputs.joinToString("\n").toByteArray()))
     }

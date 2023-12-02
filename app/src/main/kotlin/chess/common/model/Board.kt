@@ -74,5 +74,9 @@ class Board {
         // Swap the pieces on the board
         board[initialRow][initialCol] = finalPiece
         board[finalRow][finalCol] = initialPiece
+
+        // Keep the piece info
+        board[initialRow][initialCol].pieceType = selectedPiece.pieceType
+        board[initialRow][initialCol].name = selectedPiece.name
     }
 }

@@ -1,6 +1,10 @@
 package chess.common.model
 
 import chess.checkExitGame
+import chess.common.model.pieceTypes.Bishop
+import chess.common.model.pieceTypes.Knight
+import chess.common.model.pieceTypes.Pawn
+import chess.common.model.pieceTypes.Queen
 import chess.common.model.pieceTypes.Rook
 import chess.common.model.players.Player
 import chess.fancyPrintln
@@ -64,6 +68,13 @@ class Game private constructor(
                 fancyPrintln("Please enter a valid move like (e2-e4)")
             }
         } while (!isCorrectInput || !isMoveValid)
+        currentPlayer.selectedPiece?.let {
+                selectedPiece ->
+            currentPlayer.destinationPiece?.let {
+                    destinationPiece ->
+                processPromotePawn(selectedPiece, destinationPiece)
+            }
+        }
         fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
         updatePlayerPieces()
         updateScores()
@@ -193,6 +204,42 @@ class Game private constructor(
     private fun updateBoard() {
         fancyPrintln("Updating board.")
         board.swapPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
+    }
+
+    private fun processPromotePawn(
+        selectedPiece: Piece,
+        destinationPiece: Piece,
+    ) {
+        if (selectedPiece.pieceType is Pawn && (destinationPiece.position.row == 1 || destinationPiece.position.row == 8)) {
+            do {
+                fancyPrintln("Please upgrade your pawn to a piece (Q, R, N, B)")
+                val upgradeSelection = readlnOrNull()
+                when (upgradeSelection) {
+                    "Q" -> {
+                        selectedPiece.name = "${currentPlayer.name}_queen"
+                        selectedPiece.pieceType = Queen()
+                        break
+                    }
+                    "R" -> {
+                        selectedPiece.name = "${currentPlayer.name}_rook"
+                        selectedPiece.pieceType = Rook()
+                        break
+                    }
+                    "N" -> {
+                        selectedPiece.name = "${currentPlayer.name}_knight"
+                        selectedPiece.pieceType = Knight()
+                        break
+                    }
+                    "B" -> {
+                        selectedPiece.name = "${currentPlayer.name}_bishop"
+                        selectedPiece.pieceType = Bishop()
+                        break
+                    }
+                    else -> fancyPrintln("Please enter: Q, R, N, or B (e.g. Q)")
+                }
+            } while (true)
+        }
+        return
     }
 
     private fun updateAllOpenMoves(
