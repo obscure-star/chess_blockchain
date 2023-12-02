@@ -19,6 +19,13 @@ fun String.toColumnNumber(): Int {
     }
 }
 
+fun Char.toColumnNumber(): Int {
+    return when {
+        this in 'a'..'h' -> this - 'a'
+        else -> throw IllegalArgumentException("Invalid column: $this. Column should be a single character between 'a' and 'h'.")
+    }
+}
+
 fun checkExitGame(input: String?): Boolean {
     return input == "q"
 }

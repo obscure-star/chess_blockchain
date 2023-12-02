@@ -124,7 +124,98 @@ class AppTest {
             "c8-b7",
             "a2-a3",
             "e7-e5",
-            // castle here
+            "e1-c1",
+            "d8-e7",
+            "c1-b1",
+            "a7-a6",
+            "e2-c1",
+            "e8-c8",
+            "c1-b3",
+            "e5-d4",
+            "d1-d4",
+            "c6-c5",
+            "d4-d1",
+            "d7-b6",
+            "g2-g3",
+            "c8-b8",
+            "b3-a5",
+            "b7-a8",
+            "f1-h3",
+            "d6-d5",
+            "h6-f4",
+            "b8-a7",
+            "h1-e1",
+            "d5-d4",
+            "c3-d5",
+            "b6-d5",
+            "e4-d5",
+            "e7-d6",
+            "d1-d4",
+            "c5-d4",
+            "e1-e7",
+            "a7-b6",
+            "f4-d4",
+            "b6-a5",
+            "b2-b4",
+            "a5-a4",
+            "d4-c3",
+            "d6-d5",
+            "e7-a7",
+            "a8-b7",
+            "a7-b7",
+            "d5-c4",
+            "c3-f6",
+            "a4-a3",
+            "f6-a6",
+            "a3-b4",
+            "c2-c3",
+            "b4-c3",
+            "a6-a1",
+            "c3-d2",
+            "a1-b2",
+            "d2-d1",
+            "h3-f1",
+            "d8-d2",
+            "b7-d7",
+            "d2-d7",
+            "f1-c4",
+            "b5-c4",
+            "b2-h8",
+            "d7-d3",
+            "h8-a8",
+            "c4-c3",
+            "a8-a4",
+            "d1-e1",
+            "f3-f4",
+            "f7-f5",
+            "b1-c1",
+            "d3-d2",
+            "a4-a7",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+    }
+
+    @Test
+    fun `castle move`() {
+        provideInput(
+            "white",
+            "d2-d4",
+            "d7-d5",
+            "c1-g5",
+            "h7-h6",
+            "b1-c3",
+            "b8-c6",
+            "d1-d2",
+            "g8-f6",
+            "e1-c1",
+            "d8-d6",
+            "d1-e1",
             "q",
         )
 
@@ -135,8 +226,19 @@ class AppTest {
         assertTrue(game?.secondPlayer is BlackPlayer)
 
         val board = game!!.board.board
-        val pieceFinalPosition = game.secondPlayer.selectedPiece!!.position
-        val pieceInitialPosition = game.secondPlayer.destinationPiece!!.position
+        val pieceFinalPosition = game.firstPlayer.selectedPiece!!.position
+        val pieceInitialPosition = game.firstPlayer.destinationPiece!!.position
+
+        assertEquals(
+            "white_rook",
+            board[
+                8 - pieceFinalPosition.row,
+            ][pieceFinalPosition.column.toColumnNumber()].name,
+        )
+        assertEquals(
+            "empty",
+            board[8 - pieceInitialPosition.row][pieceInitialPosition.column.toColumnNumber()].name,
+        )
     }
 
     private fun provideInput(vararg inputs: String) {

@@ -8,14 +8,29 @@ data class King(
     override val name: String = "king",
     override val point: Int? = null,
     override val image: String = " K ",
+    val castleRookPositions: MutableList<Position> = mutableListOf(),
 ) : PieceType {
     override fun movePattern(
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
-        otherPlayerAllOpenPieces: List<Position>,
+        otherPlayerAllOpenPiecePositions: List<Position>,
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
+
+        validPositions.addAll(
+            castleRookPositions
+                .map { rookPosition ->
+                    Position(
+                        position.row,
+                        ((position.column.toColumnNumber() + rookPosition.column.toColumnNumber()) / 2 + 1).toColumn(),
+                    )
+                }
+                .filter { newPosition ->
+                    !otherPlayerPiecePositions.contains(newPosition.toString()) &&
+                        !playerPiecePositions.contains(newPosition.toString())
+                },
+        )
 
         fun addIfValid(
             colOffset: Int,
@@ -27,7 +42,7 @@ data class King(
             if (newCol in 1..8 && newRow in 1..8) {
                 val newPosition = Position(newRow, newCol.toColumn())
                 if (!playerPiecePositions.contains(newPosition.toString()) &&
-                    otherPlayerAllOpenPieces.none { it.toString() == newPosition.toString() }
+                    otherPlayerAllOpenPiecePositions.none { it.toString() == newPosition.toString() }
                 ) {
                     validPositions.add(newPosition)
                 }

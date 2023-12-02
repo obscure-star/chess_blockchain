@@ -173,7 +173,7 @@ data class WhitePlayer(
                 ),
                 Piece(
                     name = "${name}_king",
-                    pieceType = King(),
+                    pieceType = King(castleRookPositions = mutableListOf(Position(1, "a"), Position(1, "h"))),
                     position =
                         Position(
                             row = 1,
@@ -240,6 +240,13 @@ data class WhitePlayer(
         if (pieceToUpdate != null) {
             pieceToUpdate.initialPosition = selectedPiecePosition
             pieceToUpdate.position = destinationPiece.position.copy()
+            pieceToUpdate.position.pawnFowardMove = false // if pawn
+            if (pieceToUpdate.pieceType is Rook) {
+                (pieceToUpdate.pieceType as Rook).canCastle = false
+            }
+            if (pieceToUpdate.pieceType is King) {
+                (pieceToUpdate.pieceType as King).castleRookPositions.clear()
+            }
             pieceToUpdate.clearOpenMoves()
         }
     }
@@ -279,7 +286,7 @@ data class WhitePlayer(
 
     override fun setDestinationPiece(piece: Piece): Boolean {
         val selectedPiece = selectedPiece ?: return false
-        if (selectedPiece.openMoves.any { position -> position.toString() == piece.position.toString() }) {
+        if (selectedPiece.openMoves.any { position -> position.toString().contains(piece.position.toString()) }) {
             destinationPiece = piece
             return true
         }

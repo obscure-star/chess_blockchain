@@ -8,6 +8,7 @@ data class Rook(
     override val name: String = "rook",
     override val point: Int = 5,
     override val image: String = " R ",
+    var canCastle: Boolean = true,
 ) : PieceType {
     override fun movePattern(
         position: Position,

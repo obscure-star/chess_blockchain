@@ -1,8 +1,10 @@
 package chess.common.model
 
 import chess.checkExitGame
+import chess.common.model.pieceTypes.Rook
 import chess.common.model.players.Player
 import chess.fancyPrintln
+import chess.toColumnNumber
 
 class Game private constructor(
     val firstPlayer: Player,
@@ -35,10 +37,12 @@ class Game private constructor(
     private fun playerAction(): Boolean {
         val currentPlayerState = currentPlayer.saveState()
         val otherPlayerState = otherPlayer.saveState()
+        var castleMove: String? = null
         do {
             fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
             fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
             if (isCheck()) {
+                updateAllOpenMoves(otherPlayer, currentPlayer)
                 if (isCheckMate()) {
                     fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
                     otherPlayer.setWinner()
@@ -55,6 +59,7 @@ class Game private constructor(
             var isMoveValid = false
             if (isCorrectInput) {
                 isMoveValid = checkMove(move!!)
+                castleMove = getCastleMove(move)
             } else {
                 fancyPrintln("Please enter a valid move like (e2-e4)")
             }
@@ -68,16 +73,24 @@ class Game private constructor(
             otherPlayer.restoreState(otherPlayerState)
             return true
         }
+
         fancyPrintln(
             "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
                 "to ${currentPlayer.selectedPiece?.position} has been played.",
         )
-        // update open moves based on currentPlayer's open moves
-        currentPlayer.updateAllOpenMoves(otherPlayer.getOwnPiecePositions(), otherPlayer.allOpenMoves)
-        otherPlayer.updateAllOpenMoves(currentPlayer.getOwnPiecePositions(), currentPlayer.allOpenMoves)
 
         updateBoard()
+
+        if (castleMove in CASTLE_MOVES_MAP) {
+            if (castleMove != null) {
+                swapRook(castleMove)
+            }
+        }
+
         board.printBoard()
+
+        // update open moves based on currentPlayer's open moves
+        updateAllOpenMoves(currentPlayer, otherPlayer)
 
         // switch current player
         if (currentPlayer.name == "white") {
@@ -95,20 +108,20 @@ class Game private constructor(
         val selectedPosition = "${move[0]}${move[1]}"
         val destinationPosition = "${move[3]}${move[4]}"
         val selectedPiece =
-            currentPlayer.ownPieces.find { it.position.toString() == selectedPosition }
+            currentPlayer.ownPieces.find { it.position.toString().contains(selectedPosition) }
                 ?: return false.also {
                     fancyPrintln("$selectedPosition is an invalid selection")
                 }
         val destinationPiece =
             board.board.flatten().find {
                     piece: Piece ->
-                piece.position.toString() == destinationPosition
+                piece.position.toString().contains(destinationPosition)
             } ?: return false.also {
-                fancyPrintln("$selectedPosition is an invalid destination")
+                fancyPrintln("$destinationPosition is an invalid destination")
             }
+
         // update open moves based on otherPlayer's open moves
-        otherPlayer.updateAllOpenMoves(currentPlayer.getOwnPiecePositions(), currentPlayer.allOpenMoves)
-        currentPlayer.updateAllOpenMoves(otherPlayer.getOwnPiecePositions(), otherPlayer.allOpenMoves)
+        updateAllOpenMoves(otherPlayer, currentPlayer)
         return currentPlayer.setSelectedPiece(selectedPiece) &&
             currentPlayer.setDestinationPiece(destinationPiece)
     }
@@ -132,6 +145,7 @@ class Game private constructor(
                     piece: Piece ->
                 piece.pieceType.name.contains("king")
             }
+        kingPiece?.setOpenMoves(currentPlayer.getOwnPiecePositions(), otherPlayer.getOwnPiecePositions(), otherPlayer.allOpenMoves)
         return kingPiece?.openMoves?.isEmpty() ?: false
     }
 
@@ -181,6 +195,36 @@ class Game private constructor(
         board.swapPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
     }
 
+    private fun updateAllOpenMoves(
+        firstUpdatedPlayer: Player,
+        secondUpdatedPlayer: Player,
+    ) {
+        firstUpdatedPlayer.updateAllOpenMoves(secondUpdatedPlayer.getOwnPiecePositions(), secondUpdatedPlayer.allOpenMoves)
+        secondUpdatedPlayer.updateAllOpenMoves(firstUpdatedPlayer.getOwnPiecePositions(), firstUpdatedPlayer.allOpenMoves)
+    }
+
+    private fun getCastleMove(move: String): String? {
+        return CASTLE_MOVES_MAP.keys.find { it == move }
+    }
+
+    private fun swapRook(castleMove: String) {
+        val rookLocation = CASTLE_MOVES_MAP[castleMove]?.first
+        val emptyLocation = CASTLE_MOVES_MAP[castleMove]?.second!!
+        val rookPiece =
+            currentPlayer.ownPieces.find {
+                (
+                    it.name.contains("rook") &&
+                        it.position.toString() == rookLocation
+                ) && (it.pieceType as Rook).canCastle
+            } ?: return
+        val emptyPiece = board.board[8 - emptyLocation[1].digitToInt()][emptyLocation[0].toColumnNumber()]
+        currentPlayer.updateOwnPieces(rookPiece, emptyPiece)
+        // update destination piece position
+        emptyPiece.updatePosition(rookPiece.initialPosition)
+        board.swapPieces(rookPiece, emptyPiece)
+        // to do: check if other pieces next to rook are empty
+    }
+
     companion object {
         private var currentGame: Game? = null
 
@@ -195,5 +239,13 @@ class Game private constructor(
         fun getCurrentGame(): Game? {
             return currentGame
         }
+
+        val CASTLE_MOVES_MAP =
+            mapOf(
+                "e1-c1" to Pair("a1", "d1"),
+                "e1-g1" to Pair("h1", "f1"),
+                "e8-c8" to Pair("a8", "d8"),
+                "e8-g8" to Pair("h8", "f8"),
+            )
     }
 }
