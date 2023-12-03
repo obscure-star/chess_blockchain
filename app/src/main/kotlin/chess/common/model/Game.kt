@@ -45,6 +45,7 @@ class Game private constructor(
         do {
             fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
             fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
+            val isCheck = isCheck()
             if (isCheck()) {
                 updateAllOpenMoves(otherPlayer, currentPlayer)
                 if (isCheckMate()) {
@@ -63,7 +64,7 @@ class Game private constructor(
             var isMoveValid = false
             if (isCorrectInput) {
                 isMoveValid = checkMove(move!!)
-                castleMove = getCastleMove(move)
+                castleMove = getCastleMove(move, isCheck)
             } else {
                 fancyPrintln("Please enter a valid move like (e2-e4)")
             }
@@ -250,8 +251,14 @@ class Game private constructor(
         secondUpdatedPlayer.updateAllOpenMoves(firstUpdatedPlayer.getOwnPiecePositions(), firstUpdatedPlayer.allOpenMoves)
     }
 
-    private fun getCastleMove(move: String): String? {
-        return CASTLE_MOVES_MAP.keys.find { it == move }
+    private fun getCastleMove(
+        move: String,
+        isCheck: Boolean,
+    ): String? {
+        if (!isCheck) {
+            return CASTLE_MOVES_MAP.keys.find { it == move }
+        }
+        return null
     }
 
     private fun swapRook(castleMove: String) {

@@ -199,6 +199,21 @@ class AppTest {
         val game = Game.getCurrentGame()
         assertTrue(game?.firstPlayer is WhitePlayer)
         assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+        val pieceFinalPosition = game.firstPlayer.selectedPiece!!.position
+        val pieceInitialPosition = game.firstPlayer.destinationPiece!!.position
+
+        assertEquals(
+            "white_queen",
+            board[
+                8 - pieceFinalPosition.row,
+            ][pieceFinalPosition.column.toColumnNumber()].name,
+        )
+        assertEquals(
+            "empty",
+            board[8 - pieceInitialPosition.row][pieceInitialPosition.column.toColumnNumber()].name,
+        )
     }
 
     @Test
