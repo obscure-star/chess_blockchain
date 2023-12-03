@@ -5,10 +5,6 @@ file_version: 1.1.3
 app_version: 1.18.32
 ---
 
-# King class implementation
-
-<br/>
-
 This code snippet defines a data class called `King` that implements the `PieceType` interface. It represents a king piece in a game. The `King` class has properties such as `name`, `point`, `image`, and `castleRookPositions`.
 
 The `King` class overrides the `movePattern` function from the `PieceType` interface. This function calculates and returns a set of valid positions that the king can move to, based on the given parameters. The function checks for valid positions in horizontal, vertical, and diagonal directions, and adds them to the `validPositions` set if they meet certain conditions.
@@ -83,6 +79,8 @@ The `King` class overrides the `movePattern` function from the `PieceType` inter
 72         }
 73     }
 ```
+
+<br/>
 
 <br/>
 
