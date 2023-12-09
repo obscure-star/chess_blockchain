@@ -92,95 +92,131 @@ This code initializes the game by setting the `currentPlayer` and `otherPlayer` 
 
 <br/>
 
-This code snippet is a part of a game loop that keeps the game running until the player chooses to exit. It prompts the player for their move, validates the move, and handles various game conditions such as check and checkmate. It also updates the player's points, checks for valid input, and processes pawn promotion.
+This code snippet is part of a game logic implementation. It handles the main functionality of the game, including saving player states, checking for checkmate, getting user moves, validating moves, processing pawn promotion, updating player and piece states, and checking if an action leads to check.
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/common/model/Game.kt
 ```kotlin
-34         fun start() {
-35             // keep game running
-36             do {
-37                 val continueGame = playerAction()
-38             } while (continueGame)
-39         }
-40     
-41         private fun playerAction(): Boolean {
-42             val currentPlayerState = currentPlayer.saveState()
-43             val otherPlayerState = otherPlayer.saveState()
-44             var castleMove: String? = null
-45             do {
-46                 fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
-47                 fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
-48                 val isCheck = isCheck()
-49                 if (isCheck()) {
-50                     updateAllOpenMoves(otherPlayer, currentPlayer)
-51                     if (isCheckMate()) {
-52                         fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
-53                         otherPlayer.setWinner()
-54                         return false
-55                     }
-56                 }
-57                 fancyPrintln("Please enter your move (example: e2-e4): ")
-58                 val move = readlnOrNull()
-59                 if (checkExitGame(move)) {
-60                     fancyPrintln("exiting game :(")
-61                     return false
-62                 }
-63                 val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
-64                 var isMoveValid = false
-65                 if (isCorrectInput) {
-66                     isMoveValid = checkMove(move!!)
-67                     castleMove = getCastleMove(move, isCheck)
-68                 } else {
-69                     fancyPrintln("Please enter a valid move like (e2-e4)")
-70                 }
-71             } while (!isCorrectInput || !isMoveValid)
-72             currentPlayer.selectedPiece?.let {
-73                     selectedPiece ->
-74                 currentPlayer.destinationPiece?.let {
-75                         destinationPiece ->
-76                     processPromotePawn(selectedPiece, destinationPiece)
-77                 }
-78             }
-79             fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
-80             updatePlayerPieces()
-81             updateScores()
-82             updateDestinationPiece()
-83             if (leadsToCheck()) {
-84                 currentPlayer.restoreState(currentPlayerState)
-85                 otherPlayer.restoreState(otherPlayerState)
-86                 return true
-87             }
-88     
-89             fancyPrintln(
-90                 "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
-91                     "to ${currentPlayer.selectedPiece?.position} has been played.",
-92             )
+34         private fun start() {
+35             while (true) {
+36                 currentPlayer.saveState()
+37                 otherPlayer.saveState()
+38                 var castleMove: String?
+39                 fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
+40                 fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
+41     
+42                 // check if current king is checked
+43                 val isCheck = isCheck()
+44                 if (isCheck) {
+45                     updateAllOpenMoves(otherPlayer, currentPlayer)
+46                     if (isCheckMate()) {
+47                         fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
+48                         otherPlayer.setWinner()
+49                         return
+50                     }
+51                 }
+52     
+53                 // enter move
+54                 fancyPrintln("Please enter your move (example: e2-e4): ")
+55                 val move = readlnOrNull()
+56                 if (checkExitGame(move)) {
+57                     fancyPrintln("exiting game :(")
+58                     return
+59                 }
+60                 val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
+61                 if (isCorrectInput) {
+62                     if (!checkMove(move!!)) continue
+63                     castleMove = getCastleMove(move, isCheck)
+64                 } else {
+65                     fancyPrintln("Please enter a valid move like (e2-e4)")
+66                     continue
+67                 }
+68                 currentPlayer.selectedPiece?.let { selectedPiece ->
+69                     currentPlayer.destinationPiece?.let { destinationPiece ->
+70                         processPromotePawn(selectedPiece, destinationPiece)
+71                     }
+72                 }
+73                 fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
+74     
+75                 // update pieces and players
+76                 updatePlayerPieces()
+77                 updateScores()
+78                 updateDestinationPiece()
+79     
+80                 // if action leads to check restore player states
+81                 if (leadsToCheck()) {
+82                     currentPlayer.restoreState()
+83                     otherPlayer.restoreState()
+84                     continue
+85                 }
+86     
+87                 fancyPrintln(
+88                     "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
+89                         "to ${currentPlayer.selectedPiece?.position} has been played.",
+90                 )
+91     
+92                 updateBoard()
 93     
-94             updateBoard()
-95     
-96             if (castleMove in CASTLE_MOVES_MAP) {
-97                 if (castleMove != null) {
-98                     swapRook(castleMove)
+94                 // check if move is a castle move
+95                 if (castleMove in CASTLE_MOVES_MAP) {
+96                     if (castleMove != null) {
+97                         swapRook(castleMove)
+98                     }
 99                 }
-100            }
-101    
-102            board.printBoard()
-103    
-104            // update open moves based on currentPlayer's open moves
-105            updateAllOpenMoves(currentPlayer, otherPlayer)
-106    
-107            // switch current player
-108            if (currentPlayer.name == "white") {
-109                currentPlayer = secondPlayer
-110                otherPlayer = firstPlayer
-111            } else {
-112                currentPlayer = firstPlayer
-113                otherPlayer = secondPlayer
-114            }
-115            fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
-116            return true
-117        }
+100    
+101                board.printBoard()
+102    
+103                // update open moves based on currentPlayer's open moves
+104                updateAllOpenMoves(currentPlayer, otherPlayer)
+105    
+106                // switch current player
+107                if (currentPlayer.name == "white") {
+108                    currentPlayer = secondPlayer
+109                    otherPlayer = firstPlayer
+110                } else {
+111                    currentPlayer = firstPlayer
+112                    otherPlayer = secondPlayer
+113                }
+114                fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
+115            }
+116        }
 ```
+
+<br/>
+
+[UML diagram](https://lucid.app/lucidchart/f3380b51-5d2b-4a2b-9488-b141513f322d/edit?beaconFlowId=2BFFD1101C2A7305&invitationId=inv_79cb4f25-8b57-4510-b5e2-d1734be0a63b&page=0_0#) for the classes:
+
+<br/>
+
+<div align="center"><img src="https://firebasestorage.googleapis.com/v0/b/swimmio.appspot.com/o/repositories%2FZ2l0aHViJTNBJTNBQ2hlc3MlM0ElM0FvYnNjdXJlLXN0YXI%3D%2F7602b0d0-6939-4fcd-afd2-ce00fad54ea3.png?alt=media&token=436f0cd8-756f-47b5-86f0-c03d6b5c23da" style="width:'100%'"/></div>
+
+<br/>
+
+[Flow diagram](https://lucid.app/lucidchart/59d777de-515f-48e4-a5b4-6c1e91130f47/edit?beaconFlowId=8BF8868651B78A79&invitationId=inv_eebfcf41-b2af-4b0b-8c7c-56a0997f909c&page=0_0#) for the chess game flow:
+
+<br/>
+
+Castle moves map:
+
+This map is used to check if the move is a castle move and use the value as the location address and the destination address for the rook
+
+<br/>
+
+
+<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
+### 📄 app/src/main/kotlin/chess/common/model/Game.kt
+```kotlin
+296            val CASTLE_MOVES_MAP =
+297                mapOf(
+298                    "e1-c1" to Pair("a1", "d1"),
+299                    "e1-g1" to Pair("h1", "f1"),
+300                    "e8-c8" to Pair("a8", "d8"),
+301                    "e8-g8" to Pair("h8", "f8"),
+302                )
+```
+
+<br/>
+
+Example: "e1-c1" is the move entered "a1" is the location address for the rook and "d1" is the destination address for the rook
 
 <br/>
 

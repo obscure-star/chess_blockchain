@@ -3,6 +3,7 @@ package chess.common.model.pieceTypes
 import chess.common.model.Position
 import chess.toColumn
 import chess.toColumnNumber
+import kotlin.math.ceil
 
 data class King(
     override val name: String = "king",
@@ -18,17 +19,50 @@ data class King(
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
+        fun checkInBetweenPieces(
+            newKingPosition: Position,
+            columnOffsets: List<Int>,
+        ): Boolean {
+            for (offset in columnOffsets) {
+                val newKingPositionOffset = Position(newKingPosition.row, (newKingPosition.column.toColumnNumber() + offset + 1).toColumn())
+                if (!otherPlayerPiecePositions.contains(newKingPositionOffset.toString()) &&
+                    !playerPiecePositions.contains(newKingPositionOffset.toString())
+                ) {
+                    // Continue to the next iteration
+                    continue
+                } else {
+                    // Set the variable to false and break out of the loop
+                    return false
+                }
+            }
+            return true
+        }
+
+        // add castle moves
         validPositions.addAll(
             castleRookPositions
                 .map { rookPosition ->
                     Position(
                         position.row,
-                        ((position.column.toColumnNumber() + rookPosition.column.toColumnNumber()) / 2 + 1).toColumn(),
+                        (
+                            ceil(
+                                (
+                                    position.column.toColumnNumber() +
+                                        rookPosition.column.toColumnNumber()
+                                ).toDouble() / 2,
+                            ) + 1
+                        ).toInt().toColumn(),
                     )
                 }
-                .filter { newPosition ->
-                    !otherPlayerPiecePositions.contains(newPosition.toString()) &&
-                        !playerPiecePositions.contains(newPosition.toString())
+                .filter { newKingPosition ->
+                    val isValid =
+                        if (newKingPosition.column == "c") {
+                            checkInBetweenPieces(newKingPosition, listOf(-1, 1))
+                        } else {
+                            checkInBetweenPieces(newKingPosition, listOf(-1))
+                        }
+                    // Return the value of the boolean variable
+                    isValid
                 },
         )
 

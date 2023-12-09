@@ -12,11 +12,12 @@ interface Player {
     val selectedPiece: Piece?
     val destinationPiece: Piece?
     val allOpenMoves: List<Position>
+    val previousState: Player?
     val winner: Boolean
 
-    fun saveState(): Player
+    fun saveState()
 
-    fun restoreState(savedState: Player)
+    fun restoreState()
 
     fun defaultPieces(): List<List<Piece>>
 

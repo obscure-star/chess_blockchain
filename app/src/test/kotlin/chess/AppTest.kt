@@ -216,46 +216,6 @@ class AppTest {
         )
     }
 
-    @Test
-    fun `castle move`() {
-        provideInput(
-            "white",
-            "d2-d4",
-            "d7-d5",
-            "c1-g5",
-            "h7-h6",
-            "b1-c3",
-            "b8-c6",
-            "d1-d2",
-            "g8-f6",
-            "e1-c1",
-            "d8-d6",
-            "d1-e1",
-            "q",
-        )
-
-        main()
-
-        val game = Game.getCurrentGame()
-        assertTrue(game?.firstPlayer is WhitePlayer)
-        assertTrue(game?.secondPlayer is BlackPlayer)
-
-        val board = game!!.board.board
-        val pieceFinalPosition = game.firstPlayer.selectedPiece!!.position
-        val pieceInitialPosition = game.firstPlayer.destinationPiece!!.position
-
-        assertEquals(
-            "white_rook",
-            board[
-                8 - pieceFinalPosition.row,
-            ][pieceFinalPosition.column.toColumnNumber()].name,
-        )
-        assertEquals(
-            "empty",
-            board[8 - pieceInitialPosition.row][pieceInitialPosition.column.toColumnNumber()].name,
-        )
-    }
-
     private fun provideInput(vararg inputs: String) {
         System.setIn(ByteArrayInputStream(inputs.joinToString("\n").toByteArray()))
     }

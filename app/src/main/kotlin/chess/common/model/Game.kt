@@ -31,89 +31,88 @@ class Game private constructor(
         secondPlayer.setOwnPieces()
     }
 
-    fun start() {
-        // keep game running
-        do {
-            val continueGame = playerAction()
-        } while (continueGame)
-    }
-
-    private fun playerAction(): Boolean {
-        val currentPlayerState = currentPlayer.saveState()
-        val otherPlayerState = otherPlayer.saveState()
-        var castleMove: String? = null
-        do {
+    private fun start() {
+        while (true) {
+            currentPlayer.saveState()
+            otherPlayer.saveState()
+            var castleMove: String?
             fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
             fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
+
+            // check if current king is checked
             val isCheck = isCheck()
-            if (isCheck()) {
+            if (isCheck) {
                 updateAllOpenMoves(otherPlayer, currentPlayer)
                 if (isCheckMate()) {
                     fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
                     otherPlayer.setWinner()
-                    return false
+                    return
                 }
             }
+
+            // enter move
             fancyPrintln("Please enter your move (example: e2-e4): ")
             val move = readlnOrNull()
             if (checkExitGame(move)) {
                 fancyPrintln("exiting game :(")
-                return false
+                return
             }
             val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
-            var isMoveValid = false
             if (isCorrectInput) {
-                isMoveValid = checkMove(move!!)
+                if (!checkMove(move!!)) continue
                 castleMove = getCastleMove(move, isCheck)
             } else {
                 fancyPrintln("Please enter a valid move like (e2-e4)")
+                continue
             }
-        } while (!isCorrectInput || !isMoveValid)
-        currentPlayer.selectedPiece?.let {
-                selectedPiece ->
-            currentPlayer.destinationPiece?.let {
-                    destinationPiece ->
-                processPromotePawn(selectedPiece, destinationPiece)
+            currentPlayer.selectedPiece?.let { selectedPiece ->
+                currentPlayer.destinationPiece?.let { destinationPiece ->
+                    processPromotePawn(selectedPiece, destinationPiece)
+                }
             }
-        }
-        fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
-        updatePlayerPieces()
-        updateScores()
-        updateDestinationPiece()
-        if (leadsToCheck()) {
-            currentPlayer.restoreState(currentPlayerState)
-            otherPlayer.restoreState(otherPlayerState)
-            return true
-        }
+            fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
 
-        fancyPrintln(
-            "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
-                "to ${currentPlayer.selectedPiece?.position} has been played.",
-        )
+            // update pieces and players
+            updatePlayerPieces()
+            updateScores()
+            updateDestinationPiece()
 
-        updateBoard()
-
-        if (castleMove in CASTLE_MOVES_MAP) {
-            if (castleMove != null) {
-                swapRook(castleMove)
+            // if action leads to check restore player states
+            if (leadsToCheck()) {
+                currentPlayer.restoreState()
+                otherPlayer.restoreState()
+                continue
             }
+
+            fancyPrintln(
+                "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
+                    "to ${currentPlayer.selectedPiece?.position} has been played.",
+            )
+
+            updateBoard()
+
+            // check if move is a castle move
+            if (castleMove in CASTLE_MOVES_MAP) {
+                if (castleMove != null) {
+                    swapRook(castleMove)
+                }
+            }
+
+            board.printBoard()
+
+            // update open moves based on currentPlayer's open moves
+            updateAllOpenMoves(currentPlayer, otherPlayer)
+
+            // switch current player
+            if (currentPlayer.name == "white") {
+                currentPlayer = secondPlayer
+                otherPlayer = firstPlayer
+            } else {
+                currentPlayer = firstPlayer
+                otherPlayer = secondPlayer
+            }
+            fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
         }
-
-        board.printBoard()
-
-        // update open moves based on currentPlayer's open moves
-        updateAllOpenMoves(currentPlayer, otherPlayer)
-
-        // switch current player
-        if (currentPlayer.name == "white") {
-            currentPlayer = secondPlayer
-            otherPlayer = firstPlayer
-        } else {
-            currentPlayer = firstPlayer
-            otherPlayer = secondPlayer
-        }
-        fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
-        return true
     }
 
     private fun checkMove(move: String): Boolean {
@@ -273,10 +272,10 @@ class Game private constructor(
             } ?: return
         val emptyPiece = board.board[8 - emptyLocation[1].digitToInt()][emptyLocation[0].toColumnNumber()]
         currentPlayer.updateOwnPieces(rookPiece, emptyPiece)
+
         // update destination piece position
         emptyPiece.updatePosition(rookPiece.initialPosition)
         board.swapPieces(rookPiece, emptyPiece)
-        // to do: check if other pieces next to rook are empty
     }
 
     companion object {

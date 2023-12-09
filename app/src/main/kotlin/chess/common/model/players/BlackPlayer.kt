@@ -20,30 +20,32 @@ data class BlackPlayer(
     override var selectedPiece: Piece? = null,
     override var destinationPiece: Piece? = null,
     override var allOpenMoves: List<Position> = emptyList(),
+    override var previousState: Player? = null,
     override var winner: Boolean = false,
 ) : Player {
-    override fun saveState(): Player {
+    override fun saveState() {
         // Create a new instance with the same state
-        return BlackPlayer(
-            name,
-            playerPoints,
-            ownPieces.map { it.copy() }.toSet(),
-            wonPieces.map { it.copy() }.toSet(),
-            lostPieces.map { it.copy() }.toSet(),
-            selectedPiece?.copy(),
-            destinationPiece?.copy(),
-            allOpenMoves.map { it.copy() }.toList(),
-        )
+        previousState =
+            WhitePlayer(
+                name,
+                playerPoints,
+                ownPieces.map { it.copy() }.toSet(),
+                wonPieces.map { it.copy() }.toSet(),
+                lostPieces.map { it.copy() }.toSet(),
+                selectedPiece?.copy(),
+                destinationPiece?.copy(),
+                allOpenMoves.map { it.copy() }.toList(),
+            )
     }
 
-    override fun restoreState(savedState: Player) {
-        playerPoints = savedState.playerPoints
-        ownPieces = savedState.ownPieces.map { it.copy() }.toSet()
-        wonPieces = savedState.wonPieces.map { it.copy() }.toSet()
-        lostPieces = savedState.lostPieces.map { it.copy() }.toSet()
-        selectedPiece = savedState.selectedPiece?.copy()
-        destinationPiece = savedState.destinationPiece?.copy()
-        allOpenMoves = savedState.allOpenMoves.map { it.copy() }.toList()
+    override fun restoreState() {
+        playerPoints = previousState?.playerPoints ?: 0
+        ownPieces = previousState?.ownPieces?.map { it.copy() }?.toSet() ?: emptySet()
+        wonPieces = previousState?.wonPieces?.map { it.copy() }?.toSet() ?: emptySet()
+        lostPieces = previousState?.lostPieces?.map { it.copy() }?.toSet() ?: emptySet()
+        selectedPiece = previousState?.selectedPiece?.copy()
+        destinationPiece = previousState?.destinationPiece?.copy()
+        allOpenMoves = previousState?.allOpenMoves?.map { it.copy() }?.toList() ?: emptyList()
     }
 
     override fun defaultPieces(): MutableList<MutableList<Piece>> {
