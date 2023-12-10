@@ -143,7 +143,7 @@ This code snippet is part of a game logic implementation. It handles the main fu
 78                 updateDestinationPiece()
 79     
 80                 // if action leads to check restore player states
-81                 if (leadsToCheck()) {
+81                 if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
 82                     currentPlayer.restoreState()
 83                     otherPlayer.restoreState()
 84                     continue

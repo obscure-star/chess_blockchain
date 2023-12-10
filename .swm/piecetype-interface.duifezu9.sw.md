@@ -18,7 +18,7 @@ This code defines an interface called `PieceType` that represents a type of game
 11             position: Position,
 12             playerPiecePositions: List<String>,
 13             otherPlayerPiecePositions: List<String>,
-14             otherPlayerAllOpenPieces: List<Position>,
+14             otherPlayerAllOpenMoves: List<Position>,
 15         ): Set<Position>
 16     }
 ```

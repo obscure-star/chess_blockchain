@@ -18,7 +18,7 @@ This code snippet defines a `Queen` class that implements the `PieceType` interf
 13             position: Position,
 14             playerPiecePositions: List<String>,
 15             otherPlayerPiecePositions: List<String>,
-16             otherPlayerAllOpenPieces: List<Position>,
+16             otherPlayerAllOpenMoves: List<Position>,
 17         ): Set<Position> {
 18             val validPositions = mutableSetOf<Position>()
 19     

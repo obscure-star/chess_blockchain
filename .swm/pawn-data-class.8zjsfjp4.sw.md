@@ -18,7 +18,7 @@ This code snippet defines a `Pawn` class that represents a pawn piece in a chess
 14             position: Position,
 15             playerPiecePositions: List<String>,
 16             otherPlayerPiecePositions: List<String>,
-17             otherPlayerAllOpenPieces: List<Position>,
+17             otherPlayerAllOpenMoves: List<Position>,
 18         ): Set<Position> {
 19             val validPositions = mutableSetOf<Position>()
 20     

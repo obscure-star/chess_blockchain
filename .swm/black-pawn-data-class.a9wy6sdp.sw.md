@@ -18,7 +18,7 @@ This code snippet defines a data class `BlackPawn` that represents a black pawn 
 14             position: Position,
 15             playerPiecePositions: List<String>,
 16             otherPlayerPiecePositions: List<String>,
-17             otherPlayerAllOpenPieces: List<Position>,
+17             otherPlayerAllOpenMoves: List<Position>,
 18         ): Set<Position> {
 19             val validPositions = mutableSetOf<Position>()
 20     
@@ -38,12 +38,12 @@ This code snippet defines a data class `BlackPawn` that represents a black pawn 
 34                 val newCol = position.column.toColumnNumber() + colOffset + 1
 35                 val newRow = position.row + rowOffset
 36                 if (newCol in 1..8 && newRow in 1..8) {
-37                     if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow") &&
-38                         (
-39                             isKill(newCol, newRow, colOffset, rowOffset) || abs(colOffset) != abs(rowOffset)
-40                         )
-41                     ) {
-42                         validPositions.add(Position(newRow, newCol.toColumn()))
+37                     if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
+38                         if (isKill(newCol, newRow, colOffset, rowOffset)) {
+39                             validPositions.add(Position(newRow, newCol.toColumn()))
+40                         } else if (abs(colOffset) != abs(rowOffset)) {
+41                             validPositions.add(Position(newRow, newCol.toColumn(), true))
+42                         }
 43                     }
 44                 }
 45             }

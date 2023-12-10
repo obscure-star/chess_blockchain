@@ -1,6 +1,6 @@
 ---
 id: 60v1trdz
-title: Untitled doc
+title: Bishop data class
 file_version: 1.1.3
 app_version: 1.18.32
 ---
@@ -18,7 +18,7 @@ This code defines a `Bishop` class that represents a bishop chess piece. It impl
 13             position: Position,
 14             playerPiecePositions: List<String>,
 15             otherPlayerPiecePositions: List<String>,
-16             otherPlayerAllOpenPieces: List<Position>,
+16             otherPlayerAllOpenMoves: List<Position>,
 17         ): Set<Position> {
 18             val validPositions = mutableSetOf<Position>()
 19     

@@ -16,39 +16,61 @@ This code snippet defines a `Piece` data class that represents a game piece. It 
 11         var position: Position = Position(1, "a"),
 12         var openMoves: Set<Position> = emptySet(),
 13         var color: String = Color.WHITE.code,
-14     ) {
-15         fun setOpenMoves(
-16             playerPiecePositions: List<String>,
-17             otherPlayerPiecePositions: List<String>,
-18             otherPlayerAllOpenPieces: List<Position>,
-19         ) {
-20             openMoves =
-21                 pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
-22         }
-23     
-24         fun getInstanceOpenMoves(
-25             playerPiecePositions: List<String>,
-26             otherPlayerPiecePositions: List<String>,
-27             otherPlayerAllOpenPieces: List<Position>,
-28         ): Set<Position> {
-29             return pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
-30         }
-31     
-32         fun clearOpenMoves() {
-33             openMoves = emptySet()
-34         }
-35     
-36         fun makeEmpty() {
-37             name = "empty"
-38             pieceType = Empty()
-39             openMoves = emptySet()
-40             color = Color.WHITE.code
-41         }
-42     
-43         fun updatePosition(newPosition: Position) {
-44             position = newPosition
-45         }
-46     }
+14         var previousState: Piece? = null,
+15     ) {
+16         fun saveState() {
+17             previousState =
+18                 Piece(
+19                     name = name,
+20                     pieceType = pieceType,
+21                     initialPosition = initialPosition.copy(),
+22                     position = position.copy(),
+23                     openMoves = openMoves.map { it.copy() }.toSet(),
+24                     color = color,
+25                 )
+26         }
+27     
+28         fun restoreState() {
+29             name = previousState?.name.toString()
+30             pieceType = previousState?.pieceType ?: Empty()
+31             initialPosition = previousState?.initialPosition ?: Position(1, "a")
+32             position = previousState?.position ?: Position(1, "a")
+33             openMoves = previousState?.openMoves?.map { it.copy() }?.toSet() ?: emptySet()
+34             color = previousState?.color ?: Color.WHITE.code
+35         }
+36     
+37         fun setOpenMoves(
+38             playerPiecePositions: List<String>,
+39             otherPlayerPiecePositions: List<String>,
+40             otherPlayerAllOpenMoves: List<Position>,
+41         ) {
+42             openMoves =
+43                 pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenMoves)
+44         }
+45     
+46         fun getInstanceOpenMoves(
+47             playerPiecePositions: List<String>,
+48             otherPlayerPiecePositions: List<String>,
+49             otherPlayerAllOpenPieces: List<Position>,
+50         ): Set<Position> {
+51             return pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
+52         }
+53     
+54         fun clearOpenMoves() {
+55             openMoves = emptySet()
+56         }
+57     
+58         fun makeEmpty() {
+59             name = "empty"
+60             pieceType = Empty()
+61             openMoves = emptySet()
+62             color = Color.WHITE.code
+63         }
+64     
+65         fun updatePosition(newPosition: Position) {
+66             position = newPosition
+67         }
+68     }
 ```
 
 <br/>
@@ -57,14 +79,14 @@ This code snippet sets the `openMoves` variable by calling a `movePattern` funct
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/common/model/Piece.kt
 ```kotlin
-15         fun setOpenMoves(
-16             playerPiecePositions: List<String>,
-17             otherPlayerPiecePositions: List<String>,
-18             otherPlayerAllOpenPieces: List<Position>,
-19         ) {
-20             openMoves =
-21                 pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
-22         }
+37         fun setOpenMoves(
+38             playerPiecePositions: List<String>,
+39             otherPlayerPiecePositions: List<String>,
+40             otherPlayerAllOpenMoves: List<Position>,
+41         ) {
+42             openMoves =
+43                 pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenMoves)
+44         }
 ```
 
 <br/>
