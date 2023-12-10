@@ -19,7 +19,7 @@ This code snippet defines a `King` data class that represents a king piece in a 
 15             position: Position,
 16             playerPiecePositions: List<String>,
 17             otherPlayerPiecePositions: List<String>,
-18             otherPlayerAllOpenPieces: List<Position>,
+18             otherPlayerAllOpenMoves: List<Position>,
 19         ): Set<Position> {
 20             val validPositions = mutableSetOf<Position>()
 21     
@@ -80,7 +80,7 @@ This code snippet defines a `King` data class that represents a king piece in a 
 76                 if (newCol in 1..8 && newRow in 1..8) {
 77                     val newPosition = Position(newRow, newCol.toColumn())
 78                     if (!playerPiecePositions.contains(newPosition.toString()) &&
-79                         otherPlayerAllOpenPieces.none { it.toString() == newPosition.toString() }
+79                         otherPlayerAllOpenMoves.none { it.toString() == newPosition.toString() }
 80                     ) {
 81                         validPositions.add(newPosition)
 82                     }

@@ -26,7 +26,7 @@ data class BlackPlayer(
     override fun saveState() {
         // Create a new instance with the same state
         previousState =
-            WhitePlayer(
+            BlackPlayer(
                 name,
                 playerPoints,
                 ownPieces.map { it.copy() }.toSet(),

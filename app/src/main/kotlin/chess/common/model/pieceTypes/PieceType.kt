@@ -11,6 +11,6 @@ interface PieceType {
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
-        otherPlayerAllOpenPieces: List<Position>,
+        otherPlayerAllOpenMoves: List<Position>,
     ): Set<Position>
 }

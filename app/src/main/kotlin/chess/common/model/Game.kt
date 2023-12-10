@@ -78,7 +78,7 @@ class Game private constructor(
             updateDestinationPiece()
 
             // if action leads to check restore player states
-            if (leadsToCheck()) {
+            if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
                 currentPlayer.restoreState()
                 otherPlayer.restoreState()
                 continue
@@ -146,34 +146,69 @@ class Game private constructor(
         return otherPlayer.allOpenMoves.contains(
             kingPosition,
         ).also {
-            if (it) fancyPrintln("You are currently checked. Please move your king at $kingPosition")
+            if (it) fancyPrintln("You are currently checked. Please protect your king at $kingPosition")
         }
     }
 
     private fun isCheckMate(): Boolean {
-        val kingPiece =
-            currentPlayer.ownPieces.find {
-                    piece: Piece ->
-                piece.pieceType.name.contains("king")
+        // check there are open moves that prevent checkmate
+        for (piece in currentPlayer.ownPieces) {
+            if (piece.openMoves.isNotEmpty()) {
+                for (destinationPosition in piece.openMoves) {
+                    val destinationPiece =
+                        board.board.flatten().find {
+                            it.position == destinationPosition
+                        }
+                    if (!leadsToCheck(piece, destinationPiece, checkPieceMoves = true)) return false
+                }
             }
-        kingPiece?.setOpenMoves(currentPlayer.getOwnPiecePositions(), otherPlayer.getOwnPiecePositions(), otherPlayer.allOpenMoves)
-        return kingPiece?.openMoves?.isEmpty() ?: false
+        }
+        // check if a piece will block threatening pieces
+        return true
     }
 
-    private fun leadsToCheck(): Boolean {
-        val selectedPiece = currentPlayer.selectedPiece
-        if (selectedPiece?.name?.contains("king") == true) {
-            return false
-        }
+    private fun leadsToCheck(
+        selectedPiece: Piece,
+        destinationPiece: Piece? = null,
+        checkPieceMoves: Boolean,
+    ): Boolean {
         val kingPosition =
-            currentPlayer.ownPieces.find {
-                    piece: Piece ->
-                piece.pieceType.name.contains("king")
-            }?.position
+            if (selectedPiece.pieceType.name.contains("king")) {
+                destinationPiece?.position
+            } else {
+                currentPlayer.ownPieces.find { piece: Piece ->
+                    piece.pieceType.name.contains("king")
+                }?.position
+            }
+
+        if (checkPieceMoves) {
+            if (destinationPiece != null) {
+                currentPlayer.saveState()
+                otherPlayer.saveState()
+                selectedPiece.saveState()
+                destinationPiece.saveState()
+
+                currentPlayer.setSelectedPiece(selectedPiece)
+                currentPlayer.setDestinationPiece(destinationPiece)
+
+                updatePlayerPieces()
+                otherPlayer.setLostPieces(currentPlayer.destinationPiece)
+                updateDestinationPiece()
+                updateAllOpenMoves(currentPlayer, otherPlayer)
+
+                return otherPlayer.allOpenMoves.contains(kingPosition).also {
+                    currentPlayer.restoreState()
+                    otherPlayer.restoreState()
+                    selectedPiece.restoreState()
+                    destinationPiece.restoreState()
+                }
+            }
+        }
+
         return otherPlayer.getInstanceAllOpenMoves(currentPlayer.getOwnPiecePositions(), currentPlayer.allOpenMoves).contains(
             kingPosition,
         ).also {
-            if (it) fancyPrintln("You will be checked. Please protect your king at $kingPosition")
+            if (it && !checkPieceMoves) fancyPrintln("You will be checked. Please protect your king at $kingPosition")
         }
     }
 

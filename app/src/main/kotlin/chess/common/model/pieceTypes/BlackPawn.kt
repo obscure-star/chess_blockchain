@@ -14,7 +14,7 @@ data class BlackPawn(
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
-        otherPlayerAllOpenPieces: List<Position>,
+        otherPlayerAllOpenMoves: List<Position>,
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
@@ -34,12 +34,12 @@ data class BlackPawn(
             val newCol = position.column.toColumnNumber() + colOffset + 1
             val newRow = position.row + rowOffset
             if (newCol in 1..8 && newRow in 1..8) {
-                if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow") &&
-                    (
-                        isKill(newCol, newRow, colOffset, rowOffset) || abs(colOffset) != abs(rowOffset)
-                    )
-                ) {
-                    validPositions.add(Position(newRow, newCol.toColumn()))
+                if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
+                    if (isKill(newCol, newRow, colOffset, rowOffset)) {
+                        validPositions.add(Position(newRow, newCol.toColumn()))
+                    } else if (abs(colOffset) != abs(rowOffset)) {
+                        validPositions.add(Position(newRow, newCol.toColumn(), true))
+                    }
                 }
             }
         }

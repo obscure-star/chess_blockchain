@@ -334,6 +334,26 @@ class KingTest {
         )
     }
 
+    @Test
+    fun `not checkmate when king (e8) has no moves`() {
+        provideInput(
+            "white",
+            "e2-e4",
+            "f7-f5",
+            "d1-h5",
+            "g7-g6",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+    }
+
     private fun provideInput(vararg inputs: String) {
         System.setIn(ByteArrayInputStream(inputs.joinToString("\n").toByteArray()))
     }

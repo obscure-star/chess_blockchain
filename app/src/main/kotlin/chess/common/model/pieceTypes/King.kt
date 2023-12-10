@@ -15,7 +15,7 @@ data class King(
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
-        otherPlayerAllOpenPieces: List<Position>,
+        otherPlayerAllOpenMoves: List<Position>,
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
@@ -76,7 +76,7 @@ data class King(
             if (newCol in 1..8 && newRow in 1..8) {
                 val newPosition = Position(newRow, newCol.toColumn())
                 if (!playerPiecePositions.contains(newPosition.toString()) &&
-                    otherPlayerAllOpenPieces.none { it.toString() == newPosition.toString() }
+                    otherPlayerAllOpenMoves.none { it.toString() == newPosition.toString() }
                 ) {
                     validPositions.add(newPosition)
                 }

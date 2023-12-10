@@ -13,7 +13,7 @@ data class Queen(
         position: Position,
         playerPiecePositions: List<String>,
         otherPlayerPiecePositions: List<String>,
-        otherPlayerAllOpenPieces: List<Position>,
+        otherPlayerAllOpenMoves: List<Position>,
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
 
