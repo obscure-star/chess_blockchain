@@ -13,24 +13,25 @@ This code snippet prompts the user to input a player color (white/black) for a g
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/App.kt
 ```kotlin
-10     fun main() {
-11         fancyPrintln("Welcome to the best game of Chess!")
-12         do {
-13             fancyPrintln("Input a player (white/black): ")
-14             val inputPlayer = readlnOrNull()
-15             if (checkExitGame(inputPlayer)) {
-16                 fancyPrintln("exiting game :(")
-17                 return
-18             }
-19             val correctInput = inputPlayer?.matches(Regex("^(white|black)$")) == true
-20             if (correctInput) {
-21                 fancyPrintln("You will be playing as $inputPlayer")
-22                 startGame(inputPlayer!!)
-23             } else {
-24                 fancyPrintln("You didn't enter white or black. You entered: $inputPlayer. Please enter (white/black).")
-25             }
-26         } while (!correctInput)
-27     }
+11     suspend fun main() {
+12         fancyPrintln("Welcome to the best game of Chess!")
+13         SQLConnection.connection()
+14         do {
+15             fancyPrintln("Input a player (white/black): ")
+16             val inputPlayer = readlnOrNull()
+17             if (checkExitGame(inputPlayer)) {
+18                 fancyPrintln("exiting game :(")
+19                 return
+20             }
+21             val correctInput = inputPlayer?.matches(Regex("^(white|black)$")) == true
+22             if (correctInput) {
+23                 fancyPrintln("You will be playing as $inputPlayer")
+24                 startGame(inputPlayer!!)
+25             } else {
+26                 fancyPrintln("You didn't enter white or black. You entered: $inputPlayer. Please enter (white/black).")
+27             }
+28         } while (!correctInput)
+29     }
 ```
 
 <br/>
@@ -219,8 +220,6 @@ This map is used to check if the move is a castle move and use the value as the 
 
 Example: "e1-c1" is the move entered "a1" is the location address for the rook and "d1" is the destination address for the rook
 
-<br/>
-
 ## Machine learning implementation
 
 To implement machine learning it is essential that the player moves are persisted. This would involve:
@@ -263,6 +262,47 @@ To implement machine learning it is essential that the player moves are persiste
     *   Security
 
 I wanted to keep the database simple and iterate on it so I'm going to use what is most familiar to me which is SQL. I will be using MySQL as my Database Management tool
+
+<br/>
+
+For setting up the table a data class is needed to store all the computation that is done during a round in the game
+
+<br/>
+
+
+<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
+### 📄 app/src/main/kotlin/chess/database/ChessData.kt
+```kotlin
+3      data class ChessData(
+4          val round: Int,
+5          val boardRepresentation: String,
+6          val pieceCount: String,
+7          val legalMoves: String,
+8          val threatsAndAttacks: String,
+9          val pieceActivity: String,
+10         val kingSafety: String,
+11         val pawnStructure: String,
+12         val materialBalance: String,
+13         val centerControl: String,
+14         val previousMoves: String,
+15     )
+```
+
+<br/>
+
+This data class is populated and is used to process data that should be sent to the chess\_data database
+
+<br/>
+
+
+<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
+### 📄 app/src/main/kotlin/chess/database/ChessDataDAO.kt
+```kotlin
+11                     "INSERT INTO CHESS_DATA (Round, Board_representation, Piece_count, " +
+12                         "Legal_moves, Threats_and_attacks, Piece_activity, King_safety, " +
+13                         "Pawn_structure, Material_balance, Center_control, Previous_moves) " +
+14                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+```
 
 <br/>
 
