@@ -130,55 +130,58 @@ This code snippet is part of a game logic implementation. It handles the main fu
 65                     fancyPrintln("Please enter a valid move like (e2-e4)")
 66                     continue
 67                 }
-68                 currentPlayer.selectedPiece?.let { selectedPiece ->
-69                     currentPlayer.destinationPiece?.let { destinationPiece ->
-70                         processPromotePawn(selectedPiece, destinationPiece)
-71                     }
-72                 }
-73                 fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
-74     
-75                 // update pieces and players
-76                 updatePlayerPieces()
-77                 updateScores()
-78                 updateDestinationPiece()
-79     
-80                 // if action leads to check restore player states
-81                 if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
-82                     currentPlayer.restoreState()
-83                     otherPlayer.restoreState()
-84                     continue
-85                 }
-86     
-87                 fancyPrintln(
-88                     "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
-89                         "to ${currentPlayer.selectedPiece?.position} has been played.",
-90                 )
-91     
-92                 updateBoard()
-93     
-94                 // check if move is a castle move
-95                 if (castleMove in CASTLE_MOVES_MAP) {
-96                     if (castleMove != null) {
-97                         swapRook(castleMove)
-98                     }
-99                 }
-100    
-101                board.printBoard()
-102    
-103                // update open moves based on currentPlayer's open moves
-104                updateAllOpenMoves(currentPlayer, otherPlayer)
+68     
+69                 // promote pawn if needed
+70                 currentPlayer.selectedPiece?.let { selectedPiece ->
+71                     currentPlayer.destinationPiece?.let { destinationPiece ->
+72                         processPromotePawn(selectedPiece, destinationPiece)
+73                     }
+74                 }
+75     
+76                 fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
+77     
+78                 // update pieces and players
+79                 updatePlayerPieces()
+80                 updateScores()
+81                 updateDestinationPiece()
+82     
+83                 // if action leads to check restore player states
+84                 if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
+85                     currentPlayer.restoreState()
+86                     otherPlayer.restoreState()
+87                     continue
+88                 }
+89     
+90                 fancyPrintln(
+91                     "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
+92                         "to ${currentPlayer.selectedPiece?.position} has been played.",
+93                 )
+94     
+95                 updateBoard()
+96     
+97                 // check if move is a castle move
+98                 if (castleMove in CASTLE_MOVES_MAP) {
+99                     if (castleMove != null) {
+100                        swapRook(castleMove)
+101                    }
+102                }
+103    
+104                board.printBoard()
 105    
-106                // switch current player
-107                if (currentPlayer.name == "white") {
-108                    currentPlayer = secondPlayer
-109                    otherPlayer = firstPlayer
-110                } else {
-111                    currentPlayer = firstPlayer
-112                    otherPlayer = secondPlayer
-113                }
-114                fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
-115            }
-116        }
+106                // update open moves based on currentPlayer's open moves
+107                updateAllOpenMoves(currentPlayer, otherPlayer)
+108    
+109                // switch current player
+110                if (currentPlayer.name == "white") {
+111                    currentPlayer = secondPlayer
+112                    otherPlayer = firstPlayer
+113                } else {
+114                    currentPlayer = firstPlayer
+115                    otherPlayer = secondPlayer
+116                }
+117                fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
+118            }
+119        }
 ```
 
 <br/>
@@ -192,8 +195,6 @@ This code snippet is part of a game logic implementation. It handles the main fu
 <br/>
 
 [Flow diagram](https://lucid.app/lucidchart/59d777de-515f-48e4-a5b4-6c1e91130f47/edit?beaconFlowId=8BF8868651B78A79&invitationId=inv_eebfcf41-b2af-4b0b-8c7c-56a0997f909c&page=0_0#) for the chess game flow:
-
-<br/>
 
 Castle moves map:
 
@@ -217,6 +218,51 @@ This map is used to check if the move is a castle move and use the value as the 
 <br/>
 
 Example: "e1-c1" is the move entered "a1" is the location address for the rook and "d1" is the destination address for the rook
+
+<br/>
+
+## Machine learning implementation
+
+To implement machine learning it is essential that the player moves are persisted. This would involve:
+
+*   Creating a database to persist each move's data
+
+*   The database can look like this:
+
+<br/>
+
+|Round|Board representation<br/><br>(one hot encoding)                   |Piece count                                                                                                   |Legal moves         |Threats and attacks         |Piece activity<br/><br>(how active each piece will contribute to game)                                        |King Safety<br/><br>(solid pawn structure (shelter), castling rights, open lines of attack)|Pawn structure<br/><br>(pawn chains, isolated, double)                                                                                                         |Material Balance      |Center Control<br><br>(dependent on center locations chess.D4, chess.E4, chess.D5, chess.E5)|Previous moves       |
+|-----|------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|--------------------|----------------------------|--------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|--------------------------------------------------------------------------------------------|---------------------|
+|1    |0b1111111111111111000000000000000000000000000000001111111111111111|{ 'bP': 0, 'bN': 0, 'bB': 0, 'bR': 0, 'bQ': 0, 'bK': 0, 'wP': 0, 'wN': 0, 'wB': 0, 'wR': 0, 'wQ': 0, 'wK': 0 }|{"e2-e4", "d2-d4...}|{"e2", "e4", "f2", "e8",...}|{ 'bP': 0, 'bN': 0, 'bB': 0, 'bR': 0, 'bQ': 0, 'bK': 0, 'wP': 0, 'wN': 0, 'wB': 0, 'wR': 0, 'wQ': 0, 'wK': 0 }|{bK: 3, wK: 3}                                                                             |{extracted\_pawns: {"e2", "e4", "e5"...},<br><br>pawn\_chains: {"e5", "e6"},<br><br>doubled\_pawns: {"f3", "d2"},<br><br>backward\_pawns: {"e5", "g7"}<br><br>}|{white: 39, black: 39}|{white: 3, black: 0}                                                                        |{"e2-e4", "f2-f4"...}|
+|...  |<br/>                                                             |<br/>                                                                                                         |<br/>               |<br/>                       |<br/>                                                                                                         |<br/>                                                                                      |<br/>                                                                                                                                                          |<br/>                 |<br/>                                                                                       |<br/>                |
+
+<br/>
+
+*   The model will use data from the table to determine best moves
+
+*   The tool to handle database persistence will depend on:
+
+    *   Database type
+
+        *   SQL - Allows for complex queries and handles structured data
+
+        *   NoSQL - Allows for scalability
+
+    *   Scalability
+
+        *   AI model needs to be scalable so this
+
+    *   Data integrity and transactions
+
+    *   Query language
+
+        *   Query language will primarily be SQL
+
+    *   Consistency and Support
+
+    *   Security
+
+I wanted to keep the database simple and iterate on it so I'm going to use what is most familiar to me which is SQL. I will be using MySQL as my Database Management tool
 
 <br/>
 

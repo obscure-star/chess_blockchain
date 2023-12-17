@@ -65,11 +65,14 @@ class Game private constructor(
                 fancyPrintln("Please enter a valid move like (e2-e4)")
                 continue
             }
+
+            // promote pawn if needed
             currentPlayer.selectedPiece?.let { selectedPiece ->
                 currentPlayer.destinationPiece?.let { destinationPiece ->
                     processPromotePawn(selectedPiece, destinationPiece)
                 }
             }
+
             fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
 
             // update pieces and players
