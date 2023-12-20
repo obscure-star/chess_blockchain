@@ -14,101 +14,103 @@ This code snippet defines a `King` data class that represents a king piece in a 
 10         override val point: Int? = null,
 11         override val image: String = " K ",
 12         val castleRookPositions: MutableList<Position> = mutableListOf(),
-13     ) : PieceType {
-14         override fun movePattern(
-15             position: Position,
-16             playerPiecePositions: List<String>,
-17             otherPlayerPiecePositions: List<String>,
-18             otherPlayerAllOpenMoves: List<Position>,
-19         ): Set<Position> {
-20             val validPositions = mutableSetOf<Position>()
-21     
-22             fun checkInBetweenPieces(
-23                 newKingPosition: Position,
-24                 columnOffsets: List<Int>,
-25             ): Boolean {
-26                 for (offset in columnOffsets) {
-27                     val newKingPositionOffset = Position(newKingPosition.row, (newKingPosition.column.toColumnNumber() + offset + 1).toColumn())
-28                     if (!otherPlayerPiecePositions.contains(newKingPositionOffset.toString()) &&
-29                         !playerPiecePositions.contains(newKingPositionOffset.toString())
-30                     ) {
-31                         // Continue to the next iteration
-32                         continue
-33                     } else {
-34                         // Set the variable to false and break out of the loop
-35                         return false
-36                     }
-37                 }
-38                 return true
-39             }
-40     
-41             // add castle moves
-42             validPositions.addAll(
-43                 castleRookPositions
-44                     .map { rookPosition ->
-45                         Position(
-46                             position.row,
-47                             (
-48                                 ceil(
-49                                     (
-50                                         position.column.toColumnNumber() +
-51                                             rookPosition.column.toColumnNumber()
-52                                     ).toDouble() / 2,
-53                                 ) + 1
-54                             ).toInt().toColumn(),
-55                         )
-56                     }
-57                     .filter { newKingPosition ->
-58                         val isValid =
-59                             if (newKingPosition.column == "c") {
-60                                 checkInBetweenPieces(newKingPosition, listOf(-1, 1))
-61                             } else {
-62                                 checkInBetweenPieces(newKingPosition, listOf(-1))
-63                             }
-64                         // Return the value of the boolean variable
-65                         isValid
-66                     },
-67             )
-68     
-69             fun addIfValid(
-70                 colOffset: Int,
-71                 rowOffset: Int,
-72             ) {
-73                 val newCol = position.column.toColumnNumber() + colOffset + 1
-74                 val newRow = position.row + rowOffset
-75     
-76                 if (newCol in 1..8 && newRow in 1..8) {
-77                     val newPosition = Position(newRow, newCol.toColumn())
-78                     if (!playerPiecePositions.contains(newPosition.toString()) &&
-79                         otherPlayerAllOpenMoves.none { it.toString() == newPosition.toString() }
-80                     ) {
-81                         validPositions.add(newPosition)
-82                     }
-83                 }
-84             }
-85     
-86             // Horizontal and Vertical
-87             for (offset in -1..1) {
-88                 for (innerOffset in -1..1) {
-89                     if (offset != 0 || innerOffset != 0) {
-90                         addIfValid(offset, innerOffset)
-91                     }
-92                 }
-93             }
-94     
-95             // Diagonals
-96             for (colOffset in -1..1) {
-97                 for (rowOffset in -1..1) {
-98                     if (colOffset != 0 || rowOffset != 0) {
-99                         addIfValid(colOffset, rowOffset)
-100                    }
-101                }
-102            }
-103    
-104            // fancyPrintln("These are the valid positions: $validPositions")
-105            return validPositions
-106        }
-107    }
+13         var canCastle: Boolean = false,
+14     ) : PieceType {
+15         override fun movePattern(
+16             position: Position,
+17             playerPiecePositions: List<String>,
+18             otherPlayerPiecePositions: List<String>,
+19             otherPlayerAllOpenMoves: List<Position>,
+20         ): Set<Position> {
+21             val validPositions = mutableSetOf<Position>()
+22             canCastle = false
+23     
+24             fun checkInBetweenPieces(
+25                 newKingPosition: Position,
+26                 columnOffsets: List<Int>,
+27             ): Boolean {
+28                 for (offset in columnOffsets) {
+29                     val newKingPositionOffset = Position(newKingPosition.row, (newKingPosition.column.toColumnNumber() + offset + 1).toColumn())
+30                     if (!otherPlayerPiecePositions.contains(newKingPositionOffset.toString()) &&
+31                         !playerPiecePositions.contains(newKingPositionOffset.toString())
+32                     ) {
+33                         // Continue to the next iteration
+34                         continue
+35                     } else {
+36                         // Set the variable to false and break out of the loop
+37                         return false
+38                     }
+39                 }
+40                 return true
+41             }
+42     
+43             // add castle moves
+44             validPositions.addAll(
+45                 castleRookPositions
+46                     .map { rookPosition ->
+47                         Position(
+48                             position.row,
+49                             (
+50                                 ceil(
+51                                     (
+52                                         position.column.toColumnNumber() +
+53                                             rookPosition.column.toColumnNumber()
+54                                     ).toDouble() / 2,
+55                                 ) + 1
+56                             ).toInt().toColumn(),
+57                         )
+58                     }
+59                     .filter { newKingPosition ->
+60                         val isValid =
+61                             if (newKingPosition.column == "c") {
+62                                 checkInBetweenPieces(newKingPosition, listOf(-1, 1))
+63                             } else {
+64                                 checkInBetweenPieces(newKingPosition, listOf(-1))
+65                             }
+66                         // Return the value of the boolean variable
+67                         isValid.also { if (it) canCastle = true }
+68                     },
+69             )
+70     
+71             fun addIfValid(
+72                 colOffset: Int,
+73                 rowOffset: Int,
+74             ) {
+75                 val newCol = position.column.toColumnNumber() + colOffset + 1
+76                 val newRow = position.row + rowOffset
+77     
+78                 if (newCol in 1..8 && newRow in 1..8) {
+79                     val newPosition = Position(newRow, newCol.toColumn())
+80                     if (!playerPiecePositions.contains(newPosition.toString()) &&
+81                         otherPlayerAllOpenMoves.none { it.toString() == newPosition.toString() }
+82                     ) {
+83                         validPositions.add(newPosition)
+84                     }
+85                 }
+86             }
+87     
+88             // Horizontal and Vertical
+89             for (offset in -1..1) {
+90                 for (innerOffset in -1..1) {
+91                     if (offset != 0 || innerOffset != 0) {
+92                         addIfValid(offset, innerOffset)
+93                     }
+94                 }
+95             }
+96     
+97             // Diagonals
+98             for (colOffset in -1..1) {
+99                 for (rowOffset in -1..1) {
+100                    if (colOffset != 0 || rowOffset != 0) {
+101                        addIfValid(colOffset, rowOffset)
+102                    }
+103                }
+104            }
+105    
+106            // fancyPrintln("These are the valid positions: $validPositions")
+107            return validPositions
+108        }
+109    }
 ```
 
 <br/>

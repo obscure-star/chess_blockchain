@@ -11,4 +11,8 @@ data class Position(
         }
         return "$column$row"
     }
+
+    fun toStringWithoutP(): String {
+        return "$column$row"
+    }
 }

@@ -13,62 +13,61 @@ This code snippet prompts the user to input a player color (white/black) for a g
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/App.kt
 ```kotlin
-11     suspend fun main() {
-12         fancyPrintln("Welcome to the best game of Chess!")
-13         SQLConnection.connection()
+12     fun main() {
+13         fancyPrintln("Welcome to the best game of Chess!")
 14         do {
 15             fancyPrintln("Input a player (white/black): ")
 16             val inputPlayer = readlnOrNull()
-17             if (checkExitGame(inputPlayer)) {
-18                 fancyPrintln("exiting game :(")
-19                 return
-20             }
-21             val correctInput = inputPlayer?.matches(Regex("^(white|black)$")) == true
-22             if (correctInput) {
-23                 fancyPrintln("You will be playing as $inputPlayer")
-24                 startGame(inputPlayer!!)
-25             } else {
-26                 fancyPrintln("You didn't enter white or black. You entered: $inputPlayer. Please enter (white/black).")
-27             }
-28         } while (!correctInput)
-29     }
+17     
+18             if (checkExitGame(inputPlayer)) {
+19                 fancyPrintln("Exiting game :(")
+20                 return
+21             }
+22     
+23             val correctInput = inputPlayer?.matches(Regex("^(white|black)$", RegexOption.IGNORE_CASE)) == true
+24     
+25             if (correctInput) {
+26                 fancyPrintln("You will be playing as $inputPlayer")
+27                 startGame(inputPlayer!!)
+28             } else {
+29                 val sanitizedInput = inputPlayer?.replace(Regex("^(white|black)\\sd\\b", RegexOption.IGNORE_CASE), "$1") ?: ""
+30     
+31                 if (sanitizedInput.isNotEmpty()) {
+32                     fancyPrintln("You will be playing as $sanitizedInput")
+33                     startGame(sanitizedInput, true)
+34                 } else {
+35                     fancyPrintln("Invalid input. Please enter (white/black).")
+36                 }
+37             }
+38         } while (!correctInput)
+39     }
 ```
 
 <br/>
 
 This code snippet defines a function called `startGame` that takes a `player` parameter. The main functionality of the code is to start a new game based on the chosen player. If the `player` is "white", it starts a new game with a `WhitePlayer` and a `BlackPlayer`. If the `player` is not "white", it starts a new game with a `BlackPlayer` and a `WhitePlayer`.
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
-### 📄 app/src/main/kotlin/chess/App.kt
+### 📄 app/src/main/kotlin/chess/common/model/Game.kt
 ```kotlin
-29     fun startGame(player: String) {
-30         if (player == "white") {
-31             Game.startNewGame(
-32                 pickedPlayer =
-33                     WhitePlayer(
-34                         name = "white",
-35                         playerPoints = 0,
-36                     ),
-37                 otherPlayer =
-38                     BlackPlayer(
-39                         name = "black",
-40                         playerPoints = 0,
-41                     ),
-42             )
-43         } else {
-44             Game.startNewGame(
-45                 pickedPlayer =
-46                     BlackPlayer(
-47                         name = "black",
-48                         playerPoints = 0,
-49                     ),
-50                 otherPlayer =
-51                     WhitePlayer(
-52                         name = "white",
-53                         playerPoints = 0,
-54                     ),
-55             )
-56         }
-57     }
+356            fun startNewGame(
+357                pickedPlayer: Player,
+358                otherPlayer: Player,
+359                withDatabaseConnection: Boolean = false,
+360            ) {
+361                currentGame = Game(pickedPlayer, otherPlayer)
+362                if (withDatabaseConnection) {
+363                    connection =
+364                        runBlocking {
+365                            try {
+366                                SQLConnection.connection()
+367                            } catch (e: Exception) {
+368                                // Handle exceptions, log, or return null as appropriate
+369                                null
+370                            }
+371                        }
+372                }
+373                currentGame?.start(withDatabaseConnection)
+374            }
 ```
 
 <br/>
@@ -97,92 +96,100 @@ This code snippet is part of a game logic implementation. It handles the main fu
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/common/model/Game.kt
 ```kotlin
-34         private fun start() {
-35             while (true) {
-36                 currentPlayer.saveState()
-37                 otherPlayer.saveState()
-38                 var castleMove: String?
-39                 fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
-40                 fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
-41     
-42                 // check if current king is checked
-43                 val isCheck = isCheck()
-44                 if (isCheck) {
-45                     updateAllOpenMoves(otherPlayer, currentPlayer)
-46                     if (isCheckMate()) {
-47                         fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
-48                         otherPlayer.setWinner()
-49                         return
-50                     }
-51                 }
-52     
-53                 // enter move
-54                 fancyPrintln("Please enter your move (example: e2-e4): ")
-55                 val move = readlnOrNull()
-56                 if (checkExitGame(move)) {
-57                     fancyPrintln("exiting game :(")
-58                     return
-59                 }
-60                 val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
-61                 if (isCorrectInput) {
-62                     if (!checkMove(move!!)) continue
-63                     castleMove = getCastleMove(move, isCheck)
-64                 } else {
-65                     fancyPrintln("Please enter a valid move like (e2-e4)")
-66                     continue
-67                 }
-68     
-69                 // promote pawn if needed
-70                 currentPlayer.selectedPiece?.let { selectedPiece ->
-71                     currentPlayer.destinationPiece?.let { destinationPiece ->
-72                         processPromotePawn(selectedPiece, destinationPiece)
-73                     }
-74                 }
-75     
-76                 fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
-77     
-78                 // update pieces and players
-79                 updatePlayerPieces()
-80                 updateScores()
-81                 updateDestinationPiece()
-82     
-83                 // if action leads to check restore player states
-84                 if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
-85                     currentPlayer.restoreState()
-86                     otherPlayer.restoreState()
-87                     continue
-88                 }
-89     
-90                 fancyPrintln(
-91                     "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
-92                         "to ${currentPlayer.selectedPiece?.position} has been played.",
-93                 )
-94     
-95                 updateBoard()
-96     
-97                 // check if move is a castle move
-98                 if (castleMove in CASTLE_MOVES_MAP) {
-99                     if (castleMove != null) {
-100                        swapRook(castleMove)
-101                    }
-102                }
-103    
-104                board.printBoard()
-105    
-106                // update open moves based on currentPlayer's open moves
-107                updateAllOpenMoves(currentPlayer, otherPlayer)
+42         private fun start(withDatabaseConnection: Boolean = false) {
+43             while (true) {
+44                 currentPlayer.saveState()
+45                 otherPlayer.saveState()
+46                 var castleMove: String?
+47                 fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
+48                 fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
+49     
+50                 // check if current king is checked
+51                 val isCheck = isCheck()
+52                 if (isCheck) {
+53                     updateAllOpenMoves(otherPlayer, currentPlayer)
+54                     if (isCheckMate()) {
+55                         fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
+56                         otherPlayer.setWinner()
+57                         round += 1
+58                         sendToDatabase(withDatabaseConnection)
+59                         return
+60                     }
+61                 }
+62     
+63                 // enter move
+64                 fancyPrintln("Please enter your move (example: e2-e4): ")
+65                 val move = readlnOrNull()
+66                 if (checkExitGame(move)) {
+67                     fancyPrintln("exiting game :(")
+68                     return
+69                 }
+70                 val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
+71                 if (isCorrectInput) {
+72                     if (!checkMove(move!!)) continue
+73                     castleMove = getCastleMove(move, isCheck)
+74                 } else {
+75                     fancyPrintln("Please enter a valid move like (e2-e4)")
+76                     continue
+77                 }
+78     
+79                 // promote pawn if needed
+80                 currentPlayer.selectedPiece?.let { selectedPiece ->
+81                     currentPlayer.destinationPiece?.let { destinationPiece ->
+82                         processPromotePawn(selectedPiece, destinationPiece)
+83                     }
+84                 }
+85     
+86                 fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
+87     
+88                 // update pieces and players
+89                 updatePlayerPieces()
+90                 updateScores()
+91                 updateDestinationPiece()
+92     
+93                 // if action leads to check restore player states
+94                 if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
+95                     currentPlayer.restoreState()
+96                     otherPlayer.restoreState()
+97                     continue
+98                 }
+99     
+100                fancyPrintln(
+101                    "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
+102                        "to ${currentPlayer.selectedPiece?.position} has been played.",
+103                )
+104    
+105                // update previous moves
+106                previousMoves.add(move)
+107                updateBoard()
 108    
-109                // switch current player
-110                if (currentPlayer.name == "white") {
-111                    currentPlayer = secondPlayer
-112                    otherPlayer = firstPlayer
-113                } else {
-114                    currentPlayer = firstPlayer
-115                    otherPlayer = secondPlayer
-116                }
-117                fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
-118            }
-119        }
+109                // check if move is a castle move
+110                if (castleMove in CASTLE_MOVES_MAP) {
+111                    if (castleMove != null) {
+112                        swapRook(castleMove)
+113                    }
+114                }
+115    
+116                board.printBoard()
+117    
+118                // update open moves based on currentPlayer's open moves
+119                updateAllOpenMoves(currentPlayer, otherPlayer)
+120    
+121                round += 1
+122    
+123                sendToDatabase(withDatabaseConnection)
+124    
+125                // switch current player
+126                if (currentPlayer.name == "white") {
+127                    currentPlayer = secondPlayer
+128                    otherPlayer = firstPlayer
+129                } else {
+130                    currentPlayer = firstPlayer
+131                    otherPlayer = secondPlayer
+132                }
+133                fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
+134            }
+135        }
 ```
 
 <br/>
@@ -273,19 +280,22 @@ For setting up the table a data class is needed to store all the computation tha
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/database/ChessData.kt
 ```kotlin
-3      data class ChessData(
-4          val round: Int,
-5          val boardRepresentation: String,
-6          val pieceCount: String,
-7          val legalMoves: String,
-8          val threatsAndAttacks: String,
-9          val pieceActivity: String,
-10         val kingSafety: String,
-11         val pawnStructure: String,
-12         val materialBalance: String,
-13         val centerControl: String,
-14         val previousMoves: String,
-15     )
+6      data class ChessData(
+7          val gameId: String,
+8          val round: Int,
+9          val boardRepresentation: String,
+10         val pieceCount: String,
+11         val legalMoves: String,
+12         val threatsAndAttacks: String,
+13         val pieceActivity: String,
+14         val kingSafety: String,
+15         val pawnStructure: String?,
+16         val materialBalance: String,
+17         val centerControl: String,
+18         val previousMoves: String,
+19         val blackWin: Boolean,
+20         val whiteWin: Boolean,
+21     )
 ```
 
 <br/>
@@ -298,11 +308,47 @@ This data class is populated and is used to process data that should be sent to 
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/database/ChessDataDAO.kt
 ```kotlin
-11                     "INSERT INTO CHESS_DATA (Round, Board_representation, Piece_count, " +
-12                         "Legal_moves, Threats_and_attacks, Piece_activity, King_safety, " +
-13                         "Pawn_structure, Material_balance, Center_control, Previous_moves) " +
-14                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+17                     INSERT INTO CHESS_DATA (
+18                         ROUND_ID,
+19                         GAME_ID,
+20                         ROUND,
+21                         BOARD_REPRESENTATION,
+22                         PIECE_COUNT,
+23                         LEGAL_MOVES,
+24                         THREATS_AND_ATTACKS,
+25                         PIECE_ACTIVITY,
+26                         KING_SAFETY,
+27                         PAWN_STRUCTURE,
+28                         MATERIAL_BALANCE,
+29                         CENTER_CONTROL,
+30                         PREVIOUS_MOVES,
+31                         BLACK_WINS,
+32                         WHITE_WINS
+33                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ```
+
+<br/>
+
+To prevent Data truncation: Invalid JSON text: "Missing a name for object member." at position 1 in value for column 'CHESS\_DATA.PIECE\_COUNT' errors the String value should be converted to json format using the Json.encodeToString() function:<br/>
+
+<br/>
+
+
+<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
+### 📄 app/src/main/kotlin/chess/database/ChessDataDAO.kt
+```kotlin
+42                 preparedStatement.setString(5, Json.encodeToString(chessData.pieceCount))
+```
+
+<br/>
+
+To run the Database test suite you can use the command
+
+```
+./gradlew test --tests chess.DatabaseTest
+```
+
+<br/>
 
 <br/>
 

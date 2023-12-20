@@ -20,7 +20,10 @@ This code snippet defines a `Position` data class that represents a specific pos
 11             }
 12             return "$column$row"
 13         }
-14     }
+14     
+15         fun toStringWithoutP(): String {
+16             return "$column$row"
+17         }
 ```
 
 <br/>

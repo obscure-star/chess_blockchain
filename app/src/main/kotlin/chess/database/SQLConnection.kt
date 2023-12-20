@@ -12,7 +12,7 @@ object SQLConnection {
     suspend fun connection(): Connection? =
         withContext(Dispatchers.IO) {
             try {
-                val url = "jdbc:mysql://localhost:3306/"
+                val url = "jdbc:mysql://localhost:3306/Chess_database"
                 val user = "root"
                 val password = "obscure-star1234"
 

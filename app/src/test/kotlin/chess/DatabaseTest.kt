@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import kotlin.test.assertEquals
 
-class AppTest {
+class DatabaseTest {
     private val originalIn = System.`in`
     private val originalOut = System.out
 
@@ -23,21 +23,8 @@ class AppTest {
     }
 
     @Test
-    fun `startGame function should create a game with the correct players`() {
-        provideInput("q")
-        // Run startGame with "white" player
-        startGame("white")
-
-        // Assert that a game with WhitePlayer and BlackPlayer is created
-        // You need to have appropriate methods in the Game class to check the players
-        val game = Game.getCurrentGame()
-        assertTrue(game?.firstPlayer is WhitePlayer)
-        assertTrue(game?.secondPlayer is BlackPlayer)
-    }
-
-    @Test
     fun `white checkmates in 4 moves`() {
-        provideInput("white", "e2-e4", "f7-f5", "e4-f5", "g7-g5", "d1-h5", "q")
+        provideInput("white d", "e2-e4", "f7-f5", "e4-f5", "g7-g5", "d1-h5", "q")
 
         main()
 
@@ -63,7 +50,7 @@ class AppTest {
 
     @Test
     fun `black checkmates in 2 moves`() {
-        provideInput("white", "d2-d3", "f7-f6", "e2-e4", "g7-g5", "d1-h5", "q", "q")
+        provideInput("white d", "d2-d3", "f7-f6", "e2-e4", "g7-g5", "d1-h5", "q", "q")
 
         main()
 
@@ -76,7 +63,7 @@ class AppTest {
 
     @Test
     fun `the queen's gambit`() {
-        provideInput("white", "d2-d4", "d7-d5", "c2-c4", "d5-c4", "q")
+        provideInput("white d", "d2-d4", "d7-d5", "c2-c4", "d5-c4", "q", "q")
 
         main()
 
@@ -102,7 +89,7 @@ class AppTest {
 
     @Test
     fun `the italian defense (starter move)`() {
-        provideInput("white", "e2-e4", "e7-e5", "g1-f3", "b8-c6", "f1-c4", "q")
+        provideInput("white d", "e2-e4", "e7-e5", "g1-f3", "b8-c6", "f1-c4", "q", "q")
 
         main()
 
@@ -128,7 +115,7 @@ class AppTest {
 
     @Test
     fun `the sicilian defense (starter move)`() {
-        provideInput("white", "e2-e4", "c7-c5", "q")
+        provideInput("white d", "e2-e4", "c7-c5", "q", "q")
 
         main()
 
@@ -154,7 +141,7 @@ class AppTest {
 
     @Test
     fun `the french defense (starter move)`() {
-        provideInput("white", "e2-e4", "e7-e6", "d2-d4", "d7-d5", "q")
+        provideInput("white d", "e2-e4", "e7-e6", "d2-d4", "d7-d5", "q", "q")
 
         main()
 
@@ -180,7 +167,7 @@ class AppTest {
 
     @Test
     fun `the Ruy-Lopez (starter move)`() {
-        provideInput("white", "e2-e4", "e7-e5", "g1-f3", "b8-c6", "f1-b5", "q")
+        provideInput("white d", "e2-e4", "e7-e5", "g1-f3", "b8-c6", "f1-b5", "q", "q")
 
         main()
 
@@ -206,7 +193,7 @@ class AppTest {
 
     @Test
     fun `the slav defense (starter move)`() {
-        provideInput("white", "d2-d4", "d7-d5", "c2-c4", "c7-c6", "q")
+        provideInput("white d", "d2-d4", "d7-d5", "c2-c4", "c7-c6", "q", "q")
 
         main()
 
@@ -350,7 +337,7 @@ class AppTest {
     @Test
     fun `Morphy (white) vs Allies (black), Paris Opera 1858 game play test (white wins)`() {
         provideInput(
-            "white",
+            "white d",
             "e2-e4",
             "e7-e5",
             "g1-f3",
@@ -411,7 +398,7 @@ class AppTest {
     @Test
     fun `Aronian (white) vs Anand (black), Wijk aan Zee 2013`() {
         provideInput(
-            "white",
+            "white d",
             "d2-d4",
             "d7-d5",
             "c2-c4",
@@ -459,6 +446,7 @@ class AppTest {
             "e2-d3",
             "d4-e3",
             "q",
+            "q",
         )
 
         main()
@@ -478,7 +466,7 @@ class AppTest {
     @Test
     fun `Byrne (white) vs Fisher (black), New York 1956 (black wins)`() {
         provideInput(
-            "white",
+            "white d",
             "g1-f3",
             "g8-f6",
             "c2-c4",
@@ -561,6 +549,7 @@ class AppTest {
             "e2-c3",
             "b1-c1",
             "a2-c2",
+            "q",
             "q",
         )
 

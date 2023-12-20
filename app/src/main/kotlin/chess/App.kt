@@ -6,8 +6,6 @@ package chess
 import chess.common.model.Game
 import chess.common.model.players.BlackPlayer
 import chess.common.model.players.WhitePlayer
-import chess.database.SQLConnection
-import kotlinx.coroutines.runBlocking
 
 fun main() {
     fancyPrintln("Welcome to the best game of Chess!")
@@ -42,9 +40,6 @@ fun startGame(
     player: String,
     withDatabaseConnection: Boolean = false,
 ) {
-    if (withDatabaseConnection) {
-        runBlocking { SQLConnection.connection() }
-    }
     if (player == "white") {
         Game.startNewGame(
             pickedPlayer =
@@ -57,6 +52,7 @@ fun startGame(
                     name = "black",
                     playerPoints = 0,
                 ),
+            withDatabaseConnection,
         )
     } else {
         Game.startNewGame(
@@ -70,6 +66,7 @@ fun startGame(
                     name = "white",
                     playerPoints = 0,
                 ),
+            withDatabaseConnection,
         )
     }
 }

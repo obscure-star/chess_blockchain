@@ -10,6 +10,7 @@ data class King(
     override val point: Int? = null,
     override val image: String = " K ",
     val castleRookPositions: MutableList<Position> = mutableListOf(),
+    var canCastle: Boolean = false,
 ) : PieceType {
     override fun movePattern(
         position: Position,
@@ -18,6 +19,7 @@ data class King(
         otherPlayerAllOpenMoves: List<Position>,
     ): Set<Position> {
         val validPositions = mutableSetOf<Position>()
+        canCastle = false
 
         fun checkInBetweenPieces(
             newKingPosition: Position,
@@ -62,7 +64,7 @@ data class King(
                             checkInBetweenPieces(newKingPosition, listOf(-1))
                         }
                     // Return the value of the boolean variable
-                    isValid
+                    isValid.also { if (it) canCastle = true }
                 },
         )
 

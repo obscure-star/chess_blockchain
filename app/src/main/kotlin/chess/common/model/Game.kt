@@ -7,8 +7,13 @@ import chess.common.model.pieceTypes.Pawn
 import chess.common.model.pieceTypes.Queen
 import chess.common.model.pieceTypes.Rook
 import chess.common.model.players.Player
+import chess.database.ChessDataProcessor
+import chess.database.SQLConnection
 import chess.fancyPrintln
 import chess.toColumnNumber
+import kotlinx.coroutines.runBlocking
+import java.sql.Connection
+import java.util.UUID
 
 class Game private constructor(
     val firstPlayer: Player,
@@ -17,6 +22,9 @@ class Game private constructor(
     private var currentPlayer: Player
     private var otherPlayer: Player
     val board = Board()
+    val previousMoves = mutableListOf<String>()
+    val gameId: UUID = UUID.randomUUID()
+    private var round: Int = 0
 
     init {
         if (firstPlayer.name == "white") {
@@ -31,7 +39,7 @@ class Game private constructor(
         secondPlayer.setOwnPieces()
     }
 
-    private fun start() {
+    private fun start(withDatabaseConnection: Boolean = false) {
         while (true) {
             currentPlayer.saveState()
             otherPlayer.saveState()
@@ -46,6 +54,8 @@ class Game private constructor(
                 if (isCheckMate()) {
                     fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
                     otherPlayer.setWinner()
+                    round += 1
+                    sendToDatabase(withDatabaseConnection)
                     return
                 }
             }
@@ -92,6 +102,8 @@ class Game private constructor(
                     "to ${currentPlayer.selectedPiece?.position} has been played.",
             )
 
+            // update previous moves
+            previousMoves.add(move)
             updateBoard()
 
             // check if move is a castle move
@@ -106,6 +118,10 @@ class Game private constructor(
             // update open moves based on currentPlayer's open moves
             updateAllOpenMoves(currentPlayer, otherPlayer)
 
+            round += 1
+
+            sendToDatabase(withDatabaseConnection)
+
             // switch current player
             if (currentPlayer.name == "white") {
                 currentPlayer = secondPlayer
@@ -115,6 +131,23 @@ class Game private constructor(
                 otherPlayer = secondPlayer
             }
             fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
+        }
+    }
+
+    private fun sendToDatabase(withDatabaseConnection: Boolean) {
+        // send data to database (populate chessData)
+        if (withDatabaseConnection) {
+            currentGame?.let { game ->
+                connection?.let { connection ->
+                    ChessDataProcessor(
+                        game,
+                        board,
+                        currentPlayer,
+                        otherPlayer,
+                        connection,
+                    )
+                }
+            }?.processData(round)
         }
     }
 
@@ -318,13 +351,26 @@ class Game private constructor(
 
     companion object {
         private var currentGame: Game? = null
+        private var connection: Connection? = null
 
         fun startNewGame(
             pickedPlayer: Player,
             otherPlayer: Player,
+            withDatabaseConnection: Boolean = false,
         ) {
             currentGame = Game(pickedPlayer, otherPlayer)
-            currentGame?.start()
+            if (withDatabaseConnection) {
+                connection =
+                    runBlocking {
+                        try {
+                            SQLConnection.connection()
+                        } catch (e: Exception) {
+                            // Handle exceptions, log, or return null as appropriate
+                            null
+                        }
+                    }
+            }
+            currentGame?.start(withDatabaseConnection)
         }
 
         fun getCurrentGame(): Game? {

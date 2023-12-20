@@ -82,7 +82,7 @@ Here is [documentation](https://medium.com/@humzakhalid94/understanding-the-powe
 12         suspend fun connection(): Connection? =
 13             withContext(Dispatchers.IO) {
 14                 try {
-15                     val url = "jdbc:mysql://localhost:3306/"
+15                     val url = "jdbc:mysql://localhost:3306/Chess_database"
 16                     val user = "root"
 17                     val password = "obscure-star1234"
 18     
@@ -98,7 +98,6 @@ Here is [documentation](https://medium.com/@humzakhalid94/understanding-the-powe
 28                 }
 29             }
 30     }
-31     
 ```
 
 <br/>
@@ -137,18 +136,22 @@ To add columns to the empty database this sql query was ran:
 ### 📄 app/src/main/kotlin/chess/database/chess_database_columns.sql
 ```plsql
 2      CREATE TABLE CHESS_DATA (
-3                                  ROUND INT,
-4                                  BOARD_REPRESENTATION VARCHAR(64),
-5                                  PIECE_COUNT JSON, -- Assuming a JSON data type, adjust based on your database
-6                                  LEGAL_MOVES JSON, -- Assuming a JSON data type, adjust based on your database
-7                                  THREATS_AND_ATTACKS JSON, -- Assuming a JSON data type, adjust based on your database
-8                                  PIECE_ACTIVITY JSON, -- Assuming a JSON data type, adjust based on your database
-9                                  KING_SAFETY JSON, -- Assuming a JSON data type, adjust based on your database
-10                                 PAWN_STRUCTURE JSON, -- Assuming a JSON data type, adjust based on your database
-11                                 MATERIAL_BALANCE JSON, -- Assuming a JSON data type, adjust based on your database
-12                                 CENTER_CONTROL JSON, -- Assuming a JSON data type, adjust based on your database
-13                                 PREVIOUS_MOVES JSON -- Assuming a JSON data type, adjust based on your database
-14     );
+3                                  ROUND_ID VARCHAR(36) PRIMARY KEY,
+4                                  GAME_ID VARCHAR(36),
+5                                  ROUND INT,
+6                                  BOARD_REPRESENTATION VARCHAR(64),
+7                                  PIECE_COUNT JSON,
+8                                  LEGAL_MOVES JSON,
+9                                  THREATS_AND_ATTACKS JSON,
+10                                 PIECE_ACTIVITY JSON,
+11                                 KING_SAFETY JSON,
+12                                 PAWN_STRUCTURE JSON,
+13                                 MATERIAL_BALANCE JSON,
+14                                 CENTER_CONTROL JSON,
+15                                 PREVIOUS_MOVES JSON,
+16                                 WHITE_WINS BOOLEAN,
+17                                 BLACK_WINS BOOLEAN
+18     );
 ```
 
 <br/>

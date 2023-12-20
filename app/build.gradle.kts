@@ -13,6 +13,7 @@ plugins {
     application
 
     id("com.diffplug.spotless") version "6.22.0"
+    kotlin("plugin.serialization") version "1.6.0"
 }
 
 repositories {
@@ -23,6 +24,7 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("mysql:mysql-connector-java:8.0.28")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
     // Use the Kotlin JUnit 5 integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
