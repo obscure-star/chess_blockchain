@@ -35,12 +35,9 @@ class ChessDataProcessor(
                 materialBalance = evaluateMaterialBalance(),
                 centerControl = evaluateCentralControl(),
                 previousMoves = getPreviousMoves(),
-                blackWin =
-                    currentPlayer.name.contains("black") && currentPlayer.winner ||
-                        otherPlayer.name.contains("black") && otherPlayer.winner,
-                whiteWin =
-                    currentPlayer.name.contains("white") && currentPlayer.winner ||
-                        otherPlayer.name.contains("white") && otherPlayer.winner,
+                blackWin = isBlackWinner(),
+                whiteWin = isWhiteWinner(),
+                winner = getWinner(),
             )
         chessDataDAO.insertChessData(chessData)
     }
@@ -259,5 +256,25 @@ class ChessDataProcessor(
 
     private fun getPreviousMoves(): String {
         return game.previousMoves.toString()
+    }
+
+    private fun isBlackWinner(): Boolean {
+        return currentPlayer.name.contains("black") && currentPlayer.winner ||
+            otherPlayer.name.contains("black") && otherPlayer.winner
+    }
+
+    private fun isWhiteWinner(): Boolean {
+        return currentPlayer.name.contains("white") && currentPlayer.winner ||
+            otherPlayer.name.contains("white") && otherPlayer.winner
+    }
+
+    private fun getWinner(): Int {
+        if (isBlackWinner()) {
+            return 0
+        }
+        if (isWhiteWinner()) {
+            return 1
+        }
+        return -1
     }
 }

@@ -14,7 +14,8 @@ CREATE TABLE CHESS_DATA (
                             CENTER_CONTROL JSON,
                             PREVIOUS_MOVES JSON,
                             WHITE_WINS BOOLEAN,
-                            BLACK_WINS BOOLEAN
+                            BLACK_WINS BOOLEAN,
+                            WINNER INT
 );
 
 DROP TABLE CHESS_DATA;

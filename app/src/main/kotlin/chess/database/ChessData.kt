@@ -18,4 +18,5 @@ data class ChessData(
     val previousMoves: String,
     val blackWin: Boolean,
     val whiteWin: Boolean,
+    val winner: Int,
 )
