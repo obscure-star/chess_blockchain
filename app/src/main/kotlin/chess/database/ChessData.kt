@@ -16,6 +16,7 @@ data class ChessData(
     val materialBalance: String,
     val centerControl: String,
     val previousMoves: String,
+    val move: String,
     val blackWin: Boolean,
     val whiteWin: Boolean,
     val winner: Int,

@@ -370,6 +370,7 @@ class Game private constructor(
                         }
                     }
             }
+            // connection?.let { RandomForestImplementation().implementation(it) }
             currentGame?.start(withDatabaseConnection)
         }
 

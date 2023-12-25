@@ -35,6 +35,7 @@ class ChessDataProcessor(
                 materialBalance = evaluateMaterialBalance(),
                 centerControl = evaluateCentralControl(),
                 previousMoves = getPreviousMoves(),
+                move = "${currentPlayer.selectedPiece?.position}-${currentPlayer.destinationPiece?.position}",
                 blackWin = isBlackWinner(),
                 whiteWin = isWhiteWinner(),
                 winner = getWinner(),
