@@ -7,6 +7,8 @@ import chess.common.model.pieceTypes.Pawn
 import chess.common.model.pieceTypes.Queen
 import chess.common.model.pieceTypes.Rook
 import chess.common.model.players.Player
+import chess.database.ChessData
+import chess.database.ChessDataDAO
 import chess.database.ChessDataProcessor
 import chess.database.SQLConnection
 import chess.fancyPrintln
@@ -26,6 +28,7 @@ class Game private constructor(
     val previousMoves = mutableListOf<String>()
     val gameId: UUID = UUID.randomUUID()
     private var round: Int = 0
+    private var chessData: ChessData? = null
 
     init {
         if (firstPlayer.name == "white") {
@@ -55,8 +58,11 @@ class Game private constructor(
                 if (isCheckMate()) {
                     fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
                     otherPlayer.setWinner()
-                    round += 1
-                    sendToDatabase(withDatabaseConnection)
+                    if (withDatabaseConnection) {
+                        round += 1
+                        chessData = getChessData()
+                        chessData?.let { chessDataDAO?.insertChessData(it) }
+                    }
                     return
                 }
             }
@@ -105,6 +111,13 @@ class Game private constructor(
 
             // update previous moves
             previousMoves.add(move)
+
+            // send chess data to database
+            if (withDatabaseConnection) {
+                chessData?.nextMove = move
+                chessData?.let { chessDataDAO?.insertChessData(it) }
+            }
+
             updateBoard()
 
             // check if move is a castle move
@@ -119,9 +132,10 @@ class Game private constructor(
             // update open moves based on currentPlayer's open moves
             updateAllOpenMoves(currentPlayer, otherPlayer)
 
-            round += 1
-
-            sendToDatabase(withDatabaseConnection)
+            if (withDatabaseConnection) {
+                round += 1
+                chessData = getChessData()
+            }
 
             // switch current player
             if (currentPlayer.name == "white") {
@@ -135,21 +149,16 @@ class Game private constructor(
         }
     }
 
-    private fun sendToDatabase(withDatabaseConnection: Boolean) {
+    private fun getChessData(): ChessData? {
         // send data to database (populate chessData)
-        if (withDatabaseConnection) {
-            currentGame?.let { game ->
-                connection?.let { connection ->
-                    ChessDataProcessor(
-                        game,
-                        board,
-                        currentPlayer,
-                        otherPlayer,
-                        connection,
-                    )
-                }
-            }?.processData(round)
-        }
+        return currentGame?.let { game ->
+            ChessDataProcessor(
+                game,
+                board,
+                currentPlayer,
+                otherPlayer,
+            )
+        }?.getChessData(round)
     }
 
     private fun checkMove(move: String): Boolean {
@@ -353,6 +362,7 @@ class Game private constructor(
     companion object {
         private var currentGame: Game? = null
         private var connection: Connection? = null
+        private var chessDataDAO: ChessDataDAO? = null
 
         fun startNewGame(
             pickedPlayer: Player,
@@ -370,6 +380,7 @@ class Game private constructor(
                             null
                         }
                     }
+                chessDataDAO = connection?.let { ChessDataDAO(it) }
             }
             connection?.let { RandomForestImplementation().implementation(it) }
             currentGame?.start(withDatabaseConnection)

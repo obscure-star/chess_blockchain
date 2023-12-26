@@ -60,7 +60,7 @@ class RandomForestImplementation {
                     pieceCount + pieceActivity + kingSafety + materialBalance + centerControl
             features.add(featureRow)
             if (nextMove.length > 1) {
-                labels.add(nextMove.substring(1, nextMove.length - 1))
+                labels.add(nextMove)
             } else {
                 labels.add("END")
             }

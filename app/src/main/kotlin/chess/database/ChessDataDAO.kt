@@ -32,8 +32,9 @@ class ChessDataDAO(private val connection: Connection) {
                     MOVE,
                     BLACK_WINS,
                     WHITE_WINS,
-                    WINNER
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    WINNER,
+                    NEXT_MOVE
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent()
 
             val preparedStatement: PreparedStatement = connection.prepareStatement(sql)
@@ -52,10 +53,11 @@ class ChessDataDAO(private val connection: Connection) {
             preparedStatement.setString(12, Json.encodeToString(chessData.materialBalance))
             preparedStatement.setString(13, Json.encodeToString(chessData.centerControl))
             preparedStatement.setString(14, Json.encodeToString(chessData.previousMoves))
-            preparedStatement.setString(15, Json.encodeToString(chessData.move))
+            preparedStatement.setString(15, chessData.move)
             preparedStatement.setBoolean(16, chessData.blackWin)
             preparedStatement.setBoolean(17, chessData.whiteWin)
             preparedStatement.setInt(18, chessData.winner)
+            preparedStatement.setString(19, chessData.nextMove)
 
             val rowsAffected = preparedStatement.executeUpdate()
 

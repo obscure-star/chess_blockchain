@@ -21,4 +21,5 @@ data class ChessData(
     val blackWin: Boolean,
     val whiteWin: Boolean,
     val winner: Int,
+    var nextMove: String? = "END",
 )

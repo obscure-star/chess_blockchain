@@ -9,18 +9,14 @@ import chess.common.model.pieceTypes.King
 import chess.common.model.pieceTypes.Pawn
 import chess.common.model.players.Player
 import chess.toColumn
-import java.sql.Connection
 
 class ChessDataProcessor(
     val game: Game,
     val board: Board,
     private val currentPlayer: Player,
     private val otherPlayer: Player,
-    connection: Connection,
 ) {
-    private val chessDataDAO = ChessDataDAO(connection)
-
-    fun processData(round: Int) {
+    fun getChessData(round: Int): ChessData {
         val boardRepresentation = evaluateBoardRepresentation()
         val chessData =
             ChessData(
@@ -42,7 +38,7 @@ class ChessDataProcessor(
                 whiteWin = isWhiteWinner(),
                 winner = getWinner(),
             )
-        chessDataDAO.insertChessData(chessData)
+        return chessData
     }
 
     private fun evaluateBoardRepresentation(): String {
