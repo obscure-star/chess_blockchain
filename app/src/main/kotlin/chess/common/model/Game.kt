@@ -139,19 +139,15 @@ class Game private constructor(
             }
 
             // switch current player
-            if (currentPlayer.name == "white") {
-                currentPlayer = secondPlayer
-                otherPlayer = firstPlayer
-            } else {
-                currentPlayer = firstPlayer
-                otherPlayer = secondPlayer
-            }
+            val temp = currentPlayer
+            currentPlayer = otherPlayer
+            otherPlayer = temp
             fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
         }
     }
 
     private fun getMove(withDatabaseConnection: Boolean): String? {
-        if (currentPlayer.name == aiPlayer && withDatabaseConnection){
+        if (currentPlayer.name == aiPlayer && withDatabaseConnection) {
             return connection?.let { RandomForestImplementation().implementation(it) }
         }
         return readlnOrNull()
