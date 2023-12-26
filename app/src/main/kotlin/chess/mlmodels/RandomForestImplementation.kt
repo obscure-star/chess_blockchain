@@ -25,7 +25,7 @@ import java.sql.Connection
 class RandomForestImplementation {
     private val dataProcessing = DataProcessing()
 
-    fun implementation(connection: Connection) {
+    fun implementation(connection: Connection): String {
         // Data Processing
         val data = connection.createStatement().executeQuery("SELECT * FROM Chess_database.CHESS_DATA")
         val features = mutableListOf<DoubleArray>()
@@ -147,5 +147,6 @@ class RandomForestImplementation {
         // Convert numerical predictions back to original labels
         val predictedLabelsOriginal = predictedLabels.map { labelMap.entries.find { entry -> entry.value == it }!!.key }
         println(predictedLabelsOriginal)
+        return predictedLabelsOriginal[0]
     }
 }

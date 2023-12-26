@@ -27,33 +27,30 @@ For adding the next\_move column the following sql scripts should run:
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/database/chess_database_columns.sql
 ```plsql
-23     CREATE TABLE CHESS_DATA_NEW AS
-24     SELECT
-25         ROUND_ID,
-26         GAME_ID,
-27         ROUND,
-28         BOARD_REPRESENTATION,
-29         BOARD_REPRESENTATION_INT,
-30         PIECE_COUNT,
-31         LEGAL_MOVES,
-32         THREATS_AND_ATTACKS,
-33         PIECE_ACTIVITY,
-34         KING_SAFETY,
-35         PAWN_STRUCTURE,
-36         MATERIAL_BALANCE,
-37         CENTER_CONTROL,
-38         PREVIOUS_MOVES,
-39         MOVE,
-40         WHITE_WINS,
-41         BLACK_WINS,
-42         WINNER,
-43         COALESCE(LEAD(MOVE) OVER (PARTITION BY GAME_ID ORDER BY ROUND), 'END') AS NEXT_MOVE
-44     FROM CHESS_DATA;
-45     
-46     DROP TABLE CHESS_DATA;
-47     
-48     ALTER TABLE CHESS_DATA_NEW
-49         RENAME TO CHESS_DATA;
+2      CREATE TABLE CHESS_DATA (
+3                                  ROUND_ID VARCHAR(36) PRIMARY KEY,
+4                                  GAME_ID VARCHAR(36),
+5                                  ROUND INT,
+6                                  BOARD_REPRESENTATION VARCHAR(64),
+7                                  BOARD_REPRESENTATION_INT INT,
+8                                  PIECE_COUNT JSON,
+9                                  LEGAL_MOVES JSON,
+10                                 THREATS_AND_ATTACKS JSON,
+11                                 PIECE_ACTIVITY JSON,
+12                                 KING_SAFETY JSON,
+13                                 PAWN_STRUCTURE JSON,
+14                                 MATERIAL_BALANCE JSON,
+15                                 CENTER_CONTROL JSON,
+16                                 PREVIOUS_MOVES JSON,
+17                                 MOVE VARCHAR(36),
+18                                 WHITE_WINS BOOLEAN,
+19                                 BLACK_WINS BOOLEAN,
+20                                 WINNER INT
+21     );
+22     
+23     DROP TABLE CHESS_DATA;
+24     
+25     
 ```
 
 <br/>
@@ -77,9 +74,9 @@ imports for mac arm processor:
 29         implementation("org.deeplearning4j:deeplearning4j-core:1.0.0-M2.1")
 30         implementation("org.datavec:datavec-api:1.0.0-M2.1")
 31     
-32         implementation ("org.nd4j:nd4j-native:1.0.0-M2.1")
-33         implementation ("org.nd4j:nd4j-native:1.0.0-M2.1:macosx-arm64")
-34         implementation ("org.bytedeco:openblas:0.3.21-1.5.8:macosx-arm64")
+32         implementation("org.nd4j:nd4j-native:1.0.0-M2.1")
+33         implementation("org.nd4j:nd4j-native:1.0.0-M2.1:macosx-arm64")
+34         implementation("org.bytedeco:openblas:0.3.21-1.5.8:macosx-arm64")
 ```
 
 <br/>
@@ -89,6 +86,8 @@ imports for mac arm processor:
 <br/>
 
 The output should look similar to this
+
+<br/>
 
 <br/>
 

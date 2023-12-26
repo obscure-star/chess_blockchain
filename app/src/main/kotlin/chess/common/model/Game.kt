@@ -29,6 +29,7 @@ class Game private constructor(
     val gameId: UUID = UUID.randomUUID()
     private var round: Int = 0
     private var chessData: ChessData? = null
+    private val aiPlayer = secondPlayer.name
 
     init {
         if (firstPlayer.name == "white") {
@@ -69,7 +70,7 @@ class Game private constructor(
 
             // enter move
             fancyPrintln("Please enter your move (example: e2-e4): ")
-            val move = readlnOrNull()
+            val move = getMove(withDatabaseConnection)
             if (checkExitGame(move)) {
                 fancyPrintln("exiting game :(")
                 return
@@ -147,6 +148,13 @@ class Game private constructor(
             }
             fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
         }
+    }
+
+    private fun getMove(withDatabaseConnection: Boolean): String? {
+        if (currentPlayer.name == aiPlayer && withDatabaseConnection){
+            return connection?.let { RandomForestImplementation().implementation(it) }
+        }
+        return readlnOrNull()
     }
 
     private fun getChessData(): ChessData? {
@@ -382,7 +390,6 @@ class Game private constructor(
                     }
                 chessDataDAO = connection?.let { ChessDataDAO(it) }
             }
-            connection?.let { RandomForestImplementation().implementation(it) }
             currentGame?.start(withDatabaseConnection)
         }
 
