@@ -21,11 +21,13 @@ class ChessDataProcessor(
     private val chessDataDAO = ChessDataDAO(connection)
 
     fun processData(round: Int) {
+        val boardRepresentation = evaluateBoardRepresentation()
         val chessData =
             ChessData(
                 round = round,
                 gameId = game.gameId.toString(),
-                boardRepresentation = evaluateBoardRepresentation(),
+                boardRepresentation = boardRepresentation,
+                boardRepresentationInt = evaluateBoardRepresentationInt(boardRepresentation),
                 pieceCount = evaluatePieceCount(),
                 legalMoves = evaluateLegalMoves(),
                 threatsAndAttacks = evaluateThreatsAndAttacks(),
@@ -46,8 +48,16 @@ class ChessDataProcessor(
     private fun evaluateBoardRepresentation(): String {
         val boardList = board.board
         return boardList.flatten().joinToString("") { piece ->
-            if (piece.pieceType is Empty) "0" else "1"
+            if (piece.pieceType is King) "8" else piece.pieceType.point.toString()
         }
+    }
+
+    private fun evaluateBoardRepresentationInt(boardRepresentation: String): Int {
+        var output = 0
+        for (i in boardRepresentation.indices) {
+            output += boardRepresentation[i].digitToInt(radix = 10) * (i + 1)
+        }
+        return output
     }
 
     private fun evaluatePieceCount(): String {

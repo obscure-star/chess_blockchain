@@ -25,9 +25,16 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("mysql:mysql-connector-java:8.0.28")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation("com.github.haifengl:smile-core:3.0.2")
+    // for ml
+    implementation("org.deeplearning4j:deeplearning4j-core:1.0.0-M2.1")
+    implementation("org.datavec:datavec-api:1.0.0-M2.1")
 
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.nd4j:nd4j-native:1.0.0-M2.1")
+    implementation("org.nd4j:nd4j-native:1.0.0-M2.1:macosx-arm64")
+    implementation("org.bytedeco:openblas:0.3.21-1.5.8:macosx-arm64")
+
+    // for logging
+    implementation("ch.qos.logback:logback-classic:1.2.6")
 
     // Use the Kotlin JUnit 5 integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

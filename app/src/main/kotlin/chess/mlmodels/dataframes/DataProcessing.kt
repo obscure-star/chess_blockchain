@@ -2,54 +2,54 @@ package chess.mlmodels.dataframes
 
 class DataProcessing {
     fun convertJsonToPieceCount(jsonString: String): PieceCount {
-        val map = sanitizeJson<Int>(jsonString, "{", "}")
+        val map = sanitizeJson<Double>(jsonString, "{", "}")
 
         // Convert the map to a PieceCount object
         return PieceCount(
-            map["blackrook"] ?: 0,
-            map["blackknight"] ?: 0,
-            map["blackbishop"] ?: 0,
-            map["blackqueen"] ?: 0,
-            map["blackking"] ?: 0,
-            map["blackpawn"] ?: 0,
-            map["empty"] ?: 0,
-            map["whitepawn"] ?: 0,
-            map["whiterook"] ?: 0,
-            map["whiteknight"] ?: 0,
-            map["whitebishop"] ?: 0,
-            map["whitequeen"] ?: 0,
-            map["whiteking"] ?: 0,
+            blackRook = map["blackrook"] ?: 0.0,
+            blackKnight = map["blackknight"] ?: 0.0,
+            blackBishop = map["blackbishop"] ?: 0.0,
+            blackQueen = map["blackqueen"] ?: 0.0,
+            blackKing = map["blackking"] ?: 0.0,
+            blackPawn = map["blackpawn"] ?: 0.0,
+            empty = map["empty"] ?: 0.0,
+            whitePawn = map["whitepawn"] ?: 0.0,
+            whiteRook = map["whiterook"] ?: 0.0,
+            whiteKnight = map["whiteknight"] ?: 0.0,
+            whiteBishop = map["whitebishop"] ?: 0.0,
+            whiteQueen = map["whitequeen"] ?: 0.0,
+            whiteKing = map["whiteking"] ?: 0.0,
         )
     }
 
     fun convertJsonToPieceActivity(jsonString: String): PieceActivity {
-        val map = sanitizeJson<Int>(jsonString, "{", "}")
+        val map = sanitizeJson<Double>(jsonString, "{", "}")
 
         // Convert the map to a PieceCount object
         return PieceActivity(
-            map["blackrook"] ?: 0,
-            map["blackknight"] ?: 0,
-            map["blackbishop"] ?: 0,
-            map["blackqueen"] ?: 0,
-            map["blackking"] ?: 0,
-            map["blackpawn"] ?: 0,
-            map["empty"] ?: 0,
-            map["whitepawn"] ?: 0,
-            map["whiterook"] ?: 0,
-            map["whiteknight"] ?: 0,
-            map["whitebishop"] ?: 0,
-            map["whitequeen"] ?: 0,
-            map["whiteking"] ?: 0,
+            blackRook = map["blackrook"] ?: 0.0,
+            blackKnight = map["blackknight"] ?: 0.0,
+            blackBishop = map["blackbishop"] ?: 0.0,
+            blackQueen = map["blackqueen"] ?: 0.0,
+            blackKing = map["blackking"] ?: 0.0,
+            blackPawn = map["blackpawn"] ?: 0.0,
+            empty = map["empty"] ?: 0.0,
+            whitePawn = map["whitepawn"] ?: 0.0,
+            whiteRook = map["whiterook"] ?: 0.0,
+            whiteKnight = map["whiteknight"] ?: 0.0,
+            whiteBishop = map["whitebishop"] ?: 0.0,
+            whiteQueen = map["whitequeen"] ?: 0.0,
+            whiteKing = map["whiteking"] ?: 0.0,
         )
     }
 
     fun convertJsonToKingSafety(jsonString: String): KingSafety {
-        val map = sanitizeJson<Int>(jsonString, "{", "}")
+        val map = sanitizeJson<Double>(jsonString, "{", "}")
 
         // Convert the map to a PieceCount object
         return KingSafety(
-            map["whiteking"] ?: 0,
-            map["blackking"] ?: 0,
+            whiteKing = map["whiteking"] ?: 0.0,
+            blackKing = map["blackking"] ?: 0.0,
         )
     }
 
@@ -58,8 +58,8 @@ class DataProcessing {
 
         // Convert the map to a PieceCount object
         return LegalMoves(
-            map["white"]?.split(",")?.map { it.trim() } ?: emptyList(),
-            map["black"]?.split(",")?.map { it.trim() } ?: emptyList(),
+            white = map["white"]?.split(",")?.map { it.trim() } ?: emptyList(),
+            black = map["black"]?.split(",")?.map { it.trim() } ?: emptyList(),
         )
     }
 
@@ -76,23 +76,23 @@ class DataProcessing {
 
     fun convertJsonToMaterialBalance(jsonString: String): MaterialBalance {
         // Replace underscores with camelCase
-        val map = sanitizeJson<Int>(jsonString, "{", "}")
+        val map = sanitizeJson<Double>(jsonString, "{", "}")
 
         // Convert the map to a PieceCount object
         return MaterialBalance(
-            map["white"] ?: 0,
-            map["black"] ?: 0,
+            white = map["white"] ?: 0.0,
+            black = map["black"] ?: 0.0,
         )
     }
 
     fun convertJsonToCenterControl(jsonString: String): CenterControl {
         // Replace underscores with camelCase
-        val map = sanitizeJson<Int>(jsonString, "{", "}")
+        val map = sanitizeJson<Double>(jsonString, "{", "}")
 
         // Convert the map to a PieceCount object
         return CenterControl(
-            map["white"] ?: 0,
-            map["black"] ?: 0,
+            white = map["white"] ?: 0.0,
+            black = map["black"] ?: 0.0,
         )
     }
 
@@ -118,9 +118,9 @@ class DataProcessing {
                     val value =
                         when {
                             // Check if T is Int and convert the value accordingly
-                            T::class == Int::class ->
+                            T::class == Double::class ->
                                 keyValuePair[1].substringAfter(afterDelimiter)
-                                    .substringBefore(beforeDelimiter).toInt() as T
+                                    .substringBefore(beforeDelimiter).toDouble() as T
 
                             else -> keyValuePair[1].substringAfter(afterDelimiter).substringBefore(beforeDelimiter) as T
                         }

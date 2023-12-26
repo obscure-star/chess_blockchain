@@ -10,6 +10,7 @@ import chess.common.model.players.Player
 import chess.database.ChessDataProcessor
 import chess.database.SQLConnection
 import chess.fancyPrintln
+import chess.mlmodels.RandomForestImplementation
 import chess.toColumnNumber
 import kotlinx.coroutines.runBlocking
 import java.sql.Connection
@@ -370,7 +371,7 @@ class Game private constructor(
                         }
                     }
             }
-            // connection?.let { RandomForestImplementation().implementation(it) }
+            connection?.let { RandomForestImplementation().implementation(it) }
             currentGame?.start(withDatabaseConnection)
         }
 

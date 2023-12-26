@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class KingSafety(
-    val whiteKing: Int,
-    val blackKing: Int,
+    val whiteKing: Double,
+    val blackKing: Double,
 ) {
-    fun toList(): List<Int> {
+    fun toList(): List<Double> {
         return listOf(this.whiteKing, this.blackKing)
     }
 }

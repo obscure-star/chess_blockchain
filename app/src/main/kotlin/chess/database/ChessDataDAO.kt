@@ -19,6 +19,7 @@ class ChessDataDAO(private val connection: Connection) {
                     GAME_ID,
                     ROUND,
                     BOARD_REPRESENTATION,
+                    BOARD_REPRESENTATION_INT,
                     PIECE_COUNT,
                     LEGAL_MOVES,
                     THREATS_AND_ATTACKS,
@@ -32,7 +33,7 @@ class ChessDataDAO(private val connection: Connection) {
                     BLACK_WINS,
                     WHITE_WINS,
                     WINNER
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent()
 
             val preparedStatement: PreparedStatement = connection.prepareStatement(sql)
@@ -41,19 +42,20 @@ class ChessDataDAO(private val connection: Connection) {
             preparedStatement.setObject(2, chessData.gameId)
             preparedStatement.setInt(3, chessData.round)
             preparedStatement.setString(4, chessData.boardRepresentation)
-            preparedStatement.setString(5, Json.encodeToString(chessData.pieceCount))
-            preparedStatement.setString(6, Json.encodeToString(chessData.legalMoves))
-            preparedStatement.setString(7, Json.encodeToString(chessData.threatsAndAttacks))
-            preparedStatement.setString(8, Json.encodeToString(chessData.pieceActivity))
-            preparedStatement.setString(9, Json.encodeToString(chessData.kingSafety))
-            preparedStatement.setString(10, Json.encodeToString(chessData.pawnStructure))
-            preparedStatement.setString(11, Json.encodeToString(chessData.materialBalance))
-            preparedStatement.setString(12, Json.encodeToString(chessData.centerControl))
-            preparedStatement.setString(13, Json.encodeToString(chessData.previousMoves))
-            preparedStatement.setString(14, Json.encodeToString(chessData.move))
-            preparedStatement.setBoolean(15, chessData.blackWin)
-            preparedStatement.setBoolean(16, chessData.whiteWin)
-            preparedStatement.setInt(17, chessData.winner)
+            preparedStatement.setInt(5, chessData.boardRepresentationInt)
+            preparedStatement.setString(6, Json.encodeToString(chessData.pieceCount))
+            preparedStatement.setString(7, Json.encodeToString(chessData.legalMoves))
+            preparedStatement.setString(8, Json.encodeToString(chessData.threatsAndAttacks))
+            preparedStatement.setString(9, Json.encodeToString(chessData.pieceActivity))
+            preparedStatement.setString(10, Json.encodeToString(chessData.kingSafety))
+            preparedStatement.setString(11, Json.encodeToString(chessData.pawnStructure))
+            preparedStatement.setString(12, Json.encodeToString(chessData.materialBalance))
+            preparedStatement.setString(13, Json.encodeToString(chessData.centerControl))
+            preparedStatement.setString(14, Json.encodeToString(chessData.previousMoves))
+            preparedStatement.setString(15, Json.encodeToString(chessData.move))
+            preparedStatement.setBoolean(16, chessData.blackWin)
+            preparedStatement.setBoolean(17, chessData.whiteWin)
+            preparedStatement.setInt(18, chessData.winner)
 
             val rowsAffected = preparedStatement.executeUpdate()
 

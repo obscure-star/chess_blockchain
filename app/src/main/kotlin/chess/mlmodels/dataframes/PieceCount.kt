@@ -4,21 +4,21 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PieceCount(
-    val blackRook: Int,
-    val blackKnight: Int,
-    val blackBishop: Int,
-    val blackQueen: Int,
-    val blackKing: Int,
-    val blackPawn: Int,
-    val empty: Int,
-    val whitePawn: Int,
-    val whiteRook: Int,
-    val whiteKnight: Int,
-    val whiteBishop: Int,
-    val whiteQueen: Int,
-    val whiteKing: Int,
+    val blackRook: Double,
+    val blackKnight: Double,
+    val blackBishop: Double,
+    val blackQueen: Double,
+    val blackKing: Double,
+    val blackPawn: Double,
+    val empty: Double,
+    val whitePawn: Double,
+    val whiteRook: Double,
+    val whiteKnight: Double,
+    val whiteBishop: Double,
+    val whiteQueen: Double,
+    val whiteKing: Double,
 ) {
-    fun toList(): List<Int> {
+    fun toList(): List<Double> {
         return listOf(
             this.blackRook, this.blackKnight, this.blackBishop, this.blackQueen,
             this.blackKing, this.blackPawn, this.empty, this.whitePawn, this.whiteRook,

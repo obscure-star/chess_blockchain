@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CenterControl(
-    val white: Int,
-    val black: Int,
+    val white: Double,
+    val black: Double,
 ) {
-    fun toList(): List<Int> {
+    fun toList(): List<Double> {
         return listOf(this.white, this.black)
     }
 }

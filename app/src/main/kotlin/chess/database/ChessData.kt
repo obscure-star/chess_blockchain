@@ -7,6 +7,7 @@ data class ChessData(
     val gameId: String,
     val round: Int,
     val boardRepresentation: String,
+    val boardRepresentationInt: Int,
     val pieceCount: String,
     val legalMoves: String,
     val threatsAndAttacks: String,
