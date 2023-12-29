@@ -67,7 +67,7 @@ class ChessDataProcessor(
         return output.toString()
     }
 
-    private fun evaluateLegalMoves(): String {
+    private fun evaluateLegalMoves(): MutableMap<String, MutableList<String>> {
         val output = mutableMapOf(currentPlayer.name to mutableListOf<String>(), otherPlayer.name to mutableListOf())
 
         fun addMovesToOutput(player: Player) {
@@ -81,7 +81,7 @@ class ChessDataProcessor(
         addMovesToOutput(currentPlayer)
         addMovesToOutput(otherPlayer)
 
-        return output.toString()
+        return output
     }
 
     private fun evaluateThreatsAndAttacks(): String {

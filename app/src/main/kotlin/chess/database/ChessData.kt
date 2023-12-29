@@ -9,7 +9,7 @@ data class ChessData(
     val boardRepresentation: String,
     val boardRepresentationInt: Int,
     val pieceCount: String,
-    val legalMoves: String,
+    val legalMoves: MutableMap<String, MutableList<String>>,
     val threatsAndAttacks: String,
     val pieceActivity: String,
     val kingSafety: String,
@@ -22,4 +22,6 @@ data class ChessData(
     val whiteWin: Boolean,
     val winner: Int,
     var nextMove: String? = "END",
+    var nextMoveIndex: Int = -1,
+    var lengthLegalMoves: Int = -1,
 )

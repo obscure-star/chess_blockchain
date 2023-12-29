@@ -49,25 +49,26 @@ This code snippet defines a function called `startGame` that takes a `player` pa
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/common/model/Game.kt
 ```kotlin
-356            fun startNewGame(
-357                pickedPlayer: Player,
-358                otherPlayer: Player,
-359                withDatabaseConnection: Boolean = false,
-360            ) {
-361                currentGame = Game(pickedPlayer, otherPlayer)
-362                if (withDatabaseConnection) {
-363                    connection =
-364                        runBlocking {
-365                            try {
-366                                SQLConnection.connection()
-367                            } catch (e: Exception) {
-368                                // Handle exceptions, log, or return null as appropriate
-369                                null
-370                            }
-371                        }
-372                }
-373                currentGame?.start(withDatabaseConnection)
-374            }
+386            fun startNewGame(
+387                pickedPlayer: Player,
+388                otherPlayer: Player,
+389                withDatabaseConnection: Boolean = false,
+390            ) {
+391                currentGame = Game(pickedPlayer, otherPlayer)
+392                if (withDatabaseConnection) {
+393                    connection =
+394                        runBlocking {
+395                            try {
+396                                SQLConnection.connection()
+397                            } catch (e: Exception) {
+398                                // Handle exceptions, log, or return null as appropriate
+399                                null
+400                            }
+401                        }
+402                    chessDataDAO = connection?.let { ChessDataDAO(it) }
+403                }
+404                currentGame?.start(withDatabaseConnection)
+405            }
 ```
 
 <br/>
@@ -88,108 +89,6 @@ This code initializes the game by setting the `currentPlayer` and `otherPlayer` 
 30             firstPlayer.setOwnPieces()
 31             secondPlayer.setOwnPieces()
 32         }
-```
-
-<br/>
-
-This code snippet is part of a game logic implementation. It handles the main functionality of the game, including saving player states, checking for checkmate, getting user moves, validating moves, processing pawn promotion, updating player and piece states, and checking if an action leads to check.
-<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
-### 📄 app/src/main/kotlin/chess/common/model/Game.kt
-```kotlin
-42         private fun start(withDatabaseConnection: Boolean = false) {
-43             while (true) {
-44                 currentPlayer.saveState()
-45                 otherPlayer.saveState()
-46                 var castleMove: String?
-47                 fancyPrintln("${currentPlayer.name} has ${currentPlayer.playerPoints} points")
-48                 fancyPrintln("${otherPlayer.name} has ${otherPlayer.playerPoints} points")
-49     
-50                 // check if current king is checked
-51                 val isCheck = isCheck()
-52                 if (isCheck) {
-53                     updateAllOpenMoves(otherPlayer, currentPlayer)
-54                     if (isCheckMate()) {
-55                         fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
-56                         otherPlayer.setWinner()
-57                         round += 1
-58                         sendToDatabase(withDatabaseConnection)
-59                         return
-60                     }
-61                 }
-62     
-63                 // enter move
-64                 fancyPrintln("Please enter your move (example: e2-e4): ")
-65                 val move = readlnOrNull()
-66                 if (checkExitGame(move)) {
-67                     fancyPrintln("exiting game :(")
-68                     return
-69                 }
-70                 val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
-71                 if (isCorrectInput) {
-72                     if (!checkMove(move!!)) continue
-73                     castleMove = getCastleMove(move, isCheck)
-74                 } else {
-75                     fancyPrintln("Please enter a valid move like (e2-e4)")
-76                     continue
-77                 }
-78     
-79                 // promote pawn if needed
-80                 currentPlayer.selectedPiece?.let { selectedPiece ->
-81                     currentPlayer.destinationPiece?.let { destinationPiece ->
-82                         processPromotePawn(selectedPiece, destinationPiece)
-83                     }
-84                 }
-85     
-86                 fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
-87     
-88                 // update pieces and players
-89                 updatePlayerPieces()
-90                 updateScores()
-91                 updateDestinationPiece()
-92     
-93                 // if action leads to check restore player states
-94                 if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
-95                     currentPlayer.restoreState()
-96                     otherPlayer.restoreState()
-97                     continue
-98                 }
-99     
-100                fancyPrintln(
-101                    "${currentPlayer.selectedPiece?.name} ${currentPlayer.destinationPiece?.position} " +
-102                        "to ${currentPlayer.selectedPiece?.position} has been played.",
-103                )
-104    
-105                // update previous moves
-106                previousMoves.add(move)
-107                updateBoard()
-108    
-109                // check if move is a castle move
-110                if (castleMove in CASTLE_MOVES_MAP) {
-111                    if (castleMove != null) {
-112                        swapRook(castleMove)
-113                    }
-114                }
-115    
-116                board.printBoard()
-117    
-118                // update open moves based on currentPlayer's open moves
-119                updateAllOpenMoves(currentPlayer, otherPlayer)
-120    
-121                round += 1
-122    
-123                sendToDatabase(withDatabaseConnection)
-124    
-125                // switch current player
-126                if (currentPlayer.name == "white") {
-127                    currentPlayer = secondPlayer
-128                    otherPlayer = firstPlayer
-129                } else {
-130                    currentPlayer = firstPlayer
-131                    otherPlayer = secondPlayer
-132                }
-133                fancyPrintln("${currentPlayer.name}'s turn. Press q to quit")
-134            }
-135        }
 ```
 
 <br/>
@@ -270,8 +169,6 @@ To implement machine learning it is essential that the player moves are persiste
 
 I wanted to keep the database simple and iterate on it so I'm going to use what is most familiar to me which is SQL. I will be using MySQL as my Database Management tool
 
-<br/>
-
 For setting up the table a data class is needed to store all the computation that is done during a round in the game
 
 <br/>
@@ -284,18 +181,24 @@ For setting up the table a data class is needed to store all the computation tha
 7          val gameId: String,
 8          val round: Int,
 9          val boardRepresentation: String,
-10         val pieceCount: String,
-11         val legalMoves: String,
-12         val threatsAndAttacks: String,
-13         val pieceActivity: String,
-14         val kingSafety: String,
-15         val pawnStructure: String?,
-16         val materialBalance: String,
-17         val centerControl: String,
-18         val previousMoves: String,
-19         val blackWin: Boolean,
-20         val whiteWin: Boolean,
-21     )
+10         val boardRepresentationInt: Int,
+11         val pieceCount: String,
+12         val legalMoves: MutableMap<String, MutableList<String>>,
+13         val threatsAndAttacks: String,
+14         val pieceActivity: String,
+15         val kingSafety: String,
+16         val pawnStructure: String?,
+17         val materialBalance: String,
+18         val centerControl: String,
+19         val previousMoves: String,
+20         val move: String,
+21         val blackWin: Boolean,
+22         val whiteWin: Boolean,
+23         val winner: Int,
+24         var nextMove: String? = "END",
+25         var nextMoveIndex: Int = -1,
+26         var lengthLegalMoves: Int = -1,
+27     )
 ```
 
 <br/>
@@ -308,23 +211,29 @@ This data class is populated and is used to process data that should be sent to 
 <!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
 ### 📄 app/src/main/kotlin/chess/database/ChessDataDAO.kt
 ```kotlin
-17                     INSERT INTO CHESS_DATA (
-18                         ROUND_ID,
-19                         GAME_ID,
-20                         ROUND,
-21                         BOARD_REPRESENTATION,
-22                         PIECE_COUNT,
-23                         LEGAL_MOVES,
-24                         THREATS_AND_ATTACKS,
-25                         PIECE_ACTIVITY,
-26                         KING_SAFETY,
-27                         PAWN_STRUCTURE,
-28                         MATERIAL_BALANCE,
-29                         CENTER_CONTROL,
-30                         PREVIOUS_MOVES,
-31                         BLACK_WINS,
-32                         WHITE_WINS
-33                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+15                     INSERT INTO CHESS_DATA (
+16                         GAME_ID,
+17                         ROUND,
+18                         BOARD_REPRESENTATION,
+19                         BOARD_REPRESENTATION_INT,
+20                         PIECE_COUNT,
+21                         THREATS_AND_ATTACKS,
+22                         PIECE_ACTIVITY,
+23                         KING_SAFETY,
+24                         PAWN_STRUCTURE,
+25                         MATERIAL_BALANCE,
+26                         CENTER_CONTROL,
+27                         PREVIOUS_MOVES,
+28                         MOVE,
+29                         BLACK_WINS,
+30                         WHITE_WINS,
+31                         WINNER,
+32                         NEXT_MOVE,
+33                         NEXT_MOVE_INDEX,
+34                         LENGTH_LEGAL_MOVES,
+35                         LEGAL_MOVES
+36                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+37                     """.trimIndent()
 ```
 
 <br/>
@@ -347,8 +256,6 @@ To run the Database test suite you can use the command
 ```
 ./gradlew test --tests chess.DatabaseTest
 ```
-
-<br/>
 
 <br/>
 

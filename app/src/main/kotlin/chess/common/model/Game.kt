@@ -12,7 +12,7 @@ import chess.database.ChessDataDAO
 import chess.database.ChessDataProcessor
 import chess.database.SQLConnection
 import chess.fancyPrintln
-import chess.mlmodels.RandomForestImplementation
+import chess.mlmodels.NeuralNetworkImplementation
 import chess.toColumnNumber
 import kotlinx.coroutines.runBlocking
 import java.sql.Connection
@@ -114,9 +114,14 @@ class Game private constructor(
             previousMoves.add(move)
 
             // send chess data to database
-            if (withDatabaseConnection) {
+            if (withDatabaseConnection && round != 0) {
                 chessData?.nextMove = move
-                chessData?.let { chessDataDAO?.insertChessData(it) }
+                val legalMoves = chessData?.legalMoves?.get(currentPlayer.name)
+                if (legalMoves != null) {
+                    chessData?.nextMoveIndex = legalMoves.indexOfFirst { it.contains(move) }
+                    chessData?.lengthLegalMoves = legalMoves.size
+                    chessData?.let { chessDataDAO?.insertChessData(it) }
+                }
             }
 
             updateBoard()
@@ -147,8 +152,18 @@ class Game private constructor(
     }
 
     private fun getMove(withDatabaseConnection: Boolean): String? {
-        if (currentPlayer.name == aiPlayer && withDatabaseConnection) {
-            return connection?.let { RandomForestImplementation().implementation(it) }
+        if (withDatabaseConnection) {
+            // if (withDatabaseConnection) {
+            updateAllOpenMoves(otherPlayer, currentPlayer)
+            if (round == 0) {
+                chessData = getChessData()
+                chessData?.nextMove = "START"
+                chessData?.let { chessDataDAO?.insertChessData(it) }
+            }
+            if (currentPlayer.name == aiPlayer) {
+                val result = connection?.let { NeuralNetworkImplementation().implementation(it, currentPlayer.name) }
+                return result ?: getMove(true)
+            }
         }
         return readlnOrNull()
     }

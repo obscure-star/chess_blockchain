@@ -136,12 +136,12 @@ To add columns to the empty database this sql query was ran:
 ### 📄 app/src/main/kotlin/chess/database/chess_database_columns.sql
 ```plsql
 2      CREATE TABLE CHESS_DATA (
-3                                  ROUND_ID VARCHAR(36) PRIMARY KEY,
+3                                  ID SERIAL PRIMARY KEY,
 4                                  GAME_ID VARCHAR(36),
 5                                  ROUND INT,
 6                                  BOARD_REPRESENTATION VARCHAR(64),
-7                                  PIECE_COUNT JSON,
-8                                  LEGAL_MOVES JSON,
+7                                  BOARD_REPRESENTATION_INT INT,
+8                                  PIECE_COUNT JSON,
 9                                  THREATS_AND_ATTACKS JSON,
 10                                 PIECE_ACTIVITY JSON,
 11                                 KING_SAFETY JSON,
@@ -149,9 +149,15 @@ To add columns to the empty database this sql query was ran:
 13                                 MATERIAL_BALANCE JSON,
 14                                 CENTER_CONTROL JSON,
 15                                 PREVIOUS_MOVES JSON,
-16                                 WHITE_WINS BOOLEAN,
-17                                 BLACK_WINS BOOLEAN
-18     );
+16                                 MOVE VARCHAR(36),
+17                                 WHITE_WINS BOOLEAN,
+18                                 BLACK_WINS BOOLEAN,
+19                                 WINNER INT,
+20                                 NEXT_MOVE VARCHAR(36),
+21                                 NEXT_MOVE_INDEX INT,
+22                                 LENGTH_LEGAL_MOVES INT,
+23                                 LEGAL_MOVES JSON
+24     );
 ```
 
 <br/>
