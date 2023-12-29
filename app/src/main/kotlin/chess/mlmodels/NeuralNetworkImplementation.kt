@@ -21,66 +21,28 @@ import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.learning.config.Adam
 import org.nd4j.linalg.lossfunctions.LossFunctions
 import java.sql.Connection
-import kotlin.math.ceil
-import kotlin.math.ln
-import kotlin.math.max
+import java.sql.ResultSet
 
-class NeuralNetworkImplementation {
+class NeuralNetworkImplementation(val connection: Connection) {
     private val dataProcessing = DataProcessing()
+    private lateinit var labelMap: Map<Double, Int>
+    private val normalizer: DataNormalization = NormalizerStandardize()
+    lateinit var model: MultiLayerNetwork
 
-    fun implementation(
-        connection: Connection,
-        aiPlayerName: String,
-    ): String {
+    init {
+        buildModel()
+    }
+
+    private fun buildModel() {
         // Data Processing
-        val data = connection.createStatement().executeQuery("SELECT * FROM Chess_database.CHESS_DATA")
-        val features = mutableListOf<DoubleArray>()
-        val labels = mutableListOf<Double>()
-
-        while (data.next() && !data.isLast) {
-            val boardRepresentation = data.getString("BOARD_REPRESENTATION_INT").toDouble()
-            val round = data.getString("ROUND").toDouble()
-            val pieceCount =
-                dataProcessing.convertJsonToPieceCount(
-                    data.getString("PIECE_COUNT"),
-                ).toList().toDoubleArray()
-            val pieceActivity =
-                dataProcessing.convertJsonToPieceActivity(
-                    data.getString("PIECE_ACTIVITY"),
-                ).toList().toDoubleArray()
-            val kingSafety =
-                dataProcessing.convertJsonToKingSafety(
-                    data.getString("KING_SAFETY"),
-                ).toList().toDoubleArray()
-            val materialBalance =
-                dataProcessing.convertJsonToMaterialBalance(
-                    data.getString("MATERIAL_BALANCE"),
-                ).toList().toDoubleArray()
-            val centerControl =
-                dataProcessing.convertJsonToCenterControl(
-                    data.getString("CENTER_CONTROL"),
-                ).toList().toDoubleArray()
-            val lengthLegalMoves = data.getDouble("LENGTH_LEGAL_MOVES")
-            val nextMoveIndex = data.getDouble("NEXT_MOVE_INDEX")
-            val nextMove = data.getString("NEXT_MOVE")
-
-            val featureRow =
-                listOf(boardRepresentation).toDoubleArray() + round + lengthLegalMoves +
-                    pieceCount + pieceActivity + kingSafety + materialBalance + centerControl
-            features.add(featureRow)
-            if (nextMoveIndex > 0) {
-                labels.add(nextMoveIndex)
-            } else {
-                labels.add(0.0)
-            }
-        }
-
-        // get legal moves of the last row
-        val legalMoves = Json.decodeFromString<LegalMoves>(data.getString("LEGAL_MOVES")).getLegalMoves(aiPlayerName)
+        val data = processRecords()
+        val features = data.first
+        val labels = data.second
 
         val featuresMatrix = Nd4j.create(features.toTypedArray())
-        val labelMap = labels.distinct().withIndex().associate { it.value to it.index }
+        labelMap = labels.distinct().withIndex().associate { it.value to it.index }
         val numericalLabels = labels.map { labelMap[it]?.toDouble()!! }.toDoubleArray()
+
         // For the number of classifications. Assumes labels are 0-indexed
         val numClasses = numericalLabels.maxOrNull()!! + 1
 
@@ -97,7 +59,6 @@ class NeuralNetworkImplementation {
         val dataSet = DataSet(featuresMatrix, labelsMatrix)
 
         // Normalize the data
-        val normalizer: DataNormalization = NormalizerStandardize()
         normalizer.fit(dataSet)
         normalizer.transform(dataSet)
 
@@ -112,41 +73,36 @@ class NeuralNetworkImplementation {
         val batchSize = 32
         val iterator: DataSetIterator = ListDataSetIterator(trainingData.toList(), batchSize)
 
-        val firstLayerSize =
-            max(
-                8.0,
-                ceil(ln(featuresMatrix.columns().toDouble()) / ln(2.0)),
-            ).toInt() // Minimum size of 4
-        val secondLayerSize =
-            max(
-                4.0,
-                ceil(ln(firstLayerSize.toDouble()) / ln(2.0)),
-            ).toInt() // Minimum size of 4
-
         val conf: MultiLayerConfiguration =
             NeuralNetConfiguration.Builder()
                 .weightInit(WeightInit.RELU)
                 .activation(Activation.RELU)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(Adam(0.001))
+                .updater(Adam(0.0001))
                 .list()
                 .layer(
                     DenseLayer.Builder()
                         .nIn(featuresMatrix.columns())
-                        .nOut(128)
+                        .nOut(2048)
+                        .build(),
+                )
+                .layer(
+                    DenseLayer.Builder()
+                        .nIn(2048)
+                        .nOut(1024)
                         .build(),
                 )
                 .layer(
                     OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .activation(Activation.SOFTMAX)
-                        .nIn(128)
+                        .nIn(1024)
                         .nOut(labelMap.size) // Number of classes
                         .build(),
                 )
                 .build()
 
         // Build and train the model
-        val model = MultiLayerNetwork(conf)
+        model = MultiLayerNetwork(conf)
         model.init()
 
         for (epoch in 0..50) {
@@ -163,6 +119,85 @@ class NeuralNetworkImplementation {
         // Convert numerical predictions back to original labels
         val predictedLabelsOriginal = predictedLabels.map { labelMap.entries.find { entry -> entry.value == it }!!.key }
         println(predictedLabelsOriginal)
+    }
+
+    private fun processRecords(): Pair<MutableList<DoubleArray>, MutableList<Double>> {
+        // Data Processing
+        val data = connection.createStatement().executeQuery("SELECT * FROM Chess_database.CHESS_DATA")
+        val features = mutableListOf<DoubleArray>()
+        val labels = mutableListOf<Double>()
+
+        while (data.next() && !data.isLast) {
+            features.add(getFeatureRow(data))
+            labels.add(getLabel(data))
+        }
+        return Pair(features, labels)
+    }
+
+    private fun getFeatureRow(data: ResultSet): DoubleArray {
+        val boardRepresentation = data.getString("BOARD_REPRESENTATION_INT").toDouble()
+        val round = data.getString("ROUND").toDouble()
+        val pieceCount =
+            dataProcessing.convertJsonToPieceCount(
+                data.getString("PIECE_COUNT"),
+            ).toList().toDoubleArray()
+        val pieceActivity =
+            dataProcessing.convertJsonToPieceActivity(
+                data.getString("PIECE_ACTIVITY"),
+            ).toList().toDoubleArray()
+        val kingSafety =
+            dataProcessing.convertJsonToKingSafety(
+                data.getString("KING_SAFETY"),
+            ).toList().toDoubleArray()
+        val materialBalance =
+            dataProcessing.convertJsonToMaterialBalance(
+                data.getString("MATERIAL_BALANCE"),
+            ).toList().toDoubleArray()
+        val centerControl =
+            dataProcessing.convertJsonToCenterControl(
+                data.getString("CENTER_CONTROL"),
+            ).toList().toDoubleArray()
+        val lengthLegalMoves = data.getDouble("LENGTH_LEGAL_MOVES")
+
+        return listOf(boardRepresentation).toDoubleArray() + round + lengthLegalMoves +
+            pieceCount + pieceActivity + kingSafety + materialBalance + centerControl
+    }
+
+    private fun getLabel(data: ResultSet): Double {
+        val nextMoveIndex = data.getDouble("NEXT_MOVE_INDEX")
+        if (nextMoveIndex < 0) {
+            return 0.0
+        }
+        return nextMoveIndex
+    }
+
+    fun predictMove(aiPlayerName: String): String {
+        // get legal moves of the last row
+        val data = connection.createStatement().executeQuery("SELECT * FROM Chess_database.CHESS_DATA ORDER BY ID DESC LIMIT 1;")
+
+        data.next()
+        val features = mutableListOf<DoubleArray>()
+        val labels = mutableListOf<Double>()
+
+        features.add(getFeatureRow(data))
+        labels.add(getLabel(data))
+
+        val nextMove = data.getString("NEXT_MOVE")
+        val legalMoves =
+            Json.decodeFromString<LegalMoves>(data.getString("LEGAL_MOVES")).getLegalMoves(aiPlayerName).filter {
+                "${it[0]}${it[1]}" != "${nextMove[3]}${nextMove[4]}"
+            }
+
+        val featuresMatrix = Nd4j.create(features.toTypedArray())
+        val labelsMatrix = Nd4j.create(labels)
+
+        val dataSet = DataSet(featuresMatrix, labelsMatrix)
+
+        // Normalize the data
+        normalizer.transform(dataSet)
+
+        val predictedLabel = model.predict(dataSet.features)
+        val predictedLabelsOriginal = predictedLabel.map { labelMap.entries.find { entry -> entry.value == it }!!.key }
 
         val predictedIndex = predictedLabelsOriginal.lastOrNull()?.toInt()
 
@@ -172,8 +207,9 @@ class NeuralNetworkImplementation {
         } else {
             // Handle the case where the index is out of bounds
             println("Invalid predicted index: $predictedIndex")
-            // You might return a default move or throw an exception, depending on your requirements
-            return implementation(connection, aiPlayerName)
+            // rebuild model then predict
+            buildModel()
+            return predictMove(aiPlayerName)
         }
     }
 }

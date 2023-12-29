@@ -569,6 +569,77 @@ class DatabaseTest {
         assertTrue(game.secondPlayer.winner)
     }
 
+    @Test
+    fun `Anastasia Bodnaruk (white) vs Valentina Gunina (black), (white wins)`() {
+        provideInput(
+            "white d",
+            "e2-e4",
+            "c7-c5",
+            "b1-c3",
+            "d7-d6",
+            "f2-f4",
+            "b8-c6",
+            "f1-b5",
+            "c8-d7",
+            "g1-f3",
+            "e7-e6",
+            "e1-g1",
+            "g8-e7",
+            "a2-a4",
+            "g7-g6",
+            "d2-d4",
+            "c5-d4",
+            "f3-d4",
+            "f8-g7",
+            "c1-e3",
+            "e8-g8",
+            "d1-d2",
+            "d8-c7",
+            "a1-d1",
+            "f8-d8",
+            "d2-f2",
+            "b7-b6",
+            "b5-c6",
+            "d7-c6",
+            "f2-h4",
+            "c7-d7",
+            "f4-f5",
+            "e6-f5",
+            "d4-c6",
+            "e7-c6",
+            "e4-f5",
+            "d8-e8",
+            "e3-h6",
+            "g7-e5",
+            "c3-d5",
+            "d7-d8",
+            "h6-g5",
+            "d8-c8",
+            "h4-h6",
+            "e5-g7",
+            "d5-f6",
+            "g8-f8",
+            "h6-h7",
+            "c6-e7",
+            "h7-g8",
+            "q",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "black_king",
+            board[0][5].name,
+        )
+    }
+
     private fun provideInput(vararg inputs: String) {
         System.setIn(ByteArrayInputStream(inputs.joinToString("\n").toByteArray()))
     }

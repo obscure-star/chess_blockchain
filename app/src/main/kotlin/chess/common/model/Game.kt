@@ -60,7 +60,6 @@ class Game private constructor(
                     fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
                     otherPlayer.setWinner()
                     if (withDatabaseConnection) {
-                        round += 1
                         chessData = getChessData()
                         chessData?.let { chessDataDAO?.insertChessData(it) }
                     }
@@ -161,7 +160,7 @@ class Game private constructor(
                 chessData?.let { chessDataDAO?.insertChessData(it) }
             }
             if (currentPlayer.name == aiPlayer) {
-                val result = connection?.let { NeuralNetworkImplementation().implementation(it, currentPlayer.name) }
+                val result = connection?.let { neuralNetworkImplementation?.predictMove(currentPlayer.name) }
                 return result ?: getMove(true)
             }
         }
@@ -382,6 +381,7 @@ class Game private constructor(
         private var currentGame: Game? = null
         private var connection: Connection? = null
         private var chessDataDAO: ChessDataDAO? = null
+        private var neuralNetworkImplementation: NeuralNetworkImplementation? = null
 
         fun startNewGame(
             pickedPlayer: Player,
@@ -400,6 +400,7 @@ class Game private constructor(
                         }
                     }
                 chessDataDAO = connection?.let { ChessDataDAO(it) }
+                neuralNetworkImplementation = connection?.let { NeuralNetworkImplementation(it) }
             }
             currentGame?.start(withDatabaseConnection)
         }
