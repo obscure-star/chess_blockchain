@@ -59,4 +59,8 @@ data class BlackPawn(
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
+
+    override fun copy(): BlackPawn {
+        return BlackPawn(name, point, image)
+    }
 }

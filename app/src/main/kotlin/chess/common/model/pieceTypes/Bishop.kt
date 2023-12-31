@@ -45,4 +45,8 @@ data class Bishop(
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
+
+    override fun copy(): Bishop {
+        return Bishop(name, point, image)
+    }
 }

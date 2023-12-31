@@ -44,7 +44,10 @@ class Game private constructor(
         secondPlayer.setOwnPieces()
     }
 
-    private fun start(withDatabaseConnection: Boolean = false) {
+    private fun start(
+        withDatabaseConnection: Boolean = false,
+        withAi: Boolean = false,
+    ) {
         while (true) {
             currentPlayer.saveState()
             otherPlayer.saveState()
@@ -56,6 +59,7 @@ class Game private constructor(
             val isCheck = isCheck()
             if (isCheck) {
                 updateAllOpenMoves(otherPlayer, currentPlayer)
+                checkAiPlayer(withAi)
                 if (isCheckMate()) {
                     fancyPrintln("Checkmate! ${otherPlayer.name} has won with ${otherPlayer.playerPoints} points.")
                     otherPlayer.setWinner()
@@ -69,14 +73,21 @@ class Game private constructor(
 
             // enter move
             fancyPrintln("Please enter your move (example: e2-e4): ")
-            val move = getMove(withDatabaseConnection)
+            val move =
+                getMove(
+                    withDatabaseConnection,
+                    withAi,
+                )
             if (checkExitGame(move)) {
                 fancyPrintln("exiting game :(")
                 return
             }
             val isCorrectInput = move?.matches(Regex("[a-h][1-8]-[a-h][1-8]")) == true
             if (isCorrectInput) {
-                if (!checkMove(move!!)) continue
+                if (!checkMove(move!!)) {
+                    checkAiPlayer(withAi)
+                    continue
+                }
                 castleMove = getCastleMove(move, isCheck)
             } else {
                 fancyPrintln("Please enter a valid move like (e2-e4)")
@@ -93,14 +104,23 @@ class Game private constructor(
             fancyPrintln("${currentPlayer.selectedPiece?.name} open moves: ${currentPlayer.selectedPiece?.openMoves}")
 
             // update pieces and players
-            updatePlayerPieces()
+            updatePlayerPieces(currentPlayer)
             updateScores()
-            updateDestinationPiece()
+            updateDestinationPiece(currentPlayer)
 
             // if action leads to check restore player states
-            if (currentPlayer.selectedPiece?.let { leadsToCheck(it, checkPieceMoves = false) } == true) {
+            if (currentPlayer.selectedPiece?.let {
+                    leadsToCheck(
+                        it,
+                        checkPieceMoves = false,
+                        currentPlayer = currentPlayer,
+                        otherPlayer = otherPlayer,
+                    )
+                } == true
+            ) {
                 currentPlayer.restoreState()
                 otherPlayer.restoreState()
+                checkAiPlayer(withAi)
                 continue
             }
 
@@ -150,7 +170,16 @@ class Game private constructor(
         }
     }
 
-    private fun getMove(withDatabaseConnection: Boolean): String? {
+    private fun checkAiPlayer(withAi: Boolean = false) {
+        if (withAi && currentPlayer.name == aiPlayer) {
+            neuralNetworkImplementation?.buildModel()
+        }
+    }
+
+    private fun getMove(
+        withDatabaseConnection: Boolean = false,
+        withAi: Boolean = false,
+    ): String? {
         if (withDatabaseConnection) {
             // if (withDatabaseConnection) {
             updateAllOpenMoves(otherPlayer, currentPlayer)
@@ -159,9 +188,15 @@ class Game private constructor(
                 chessData?.nextMove = "START"
                 chessData?.let { chessDataDAO?.insertChessData(it) }
             }
-            if (currentPlayer.name == aiPlayer) {
-                val result = connection?.let { neuralNetworkImplementation?.predictMove(currentPlayer.name) }
-                return result ?: getMove(true)
+            if (withAi && currentPlayer.name == aiPlayer) {
+                val result =
+                    connection?.let {
+                        neuralNetworkImplementation?.predictMove(
+                            currentPlayer.name,
+                            chessData?.legalMoves?.get(currentPlayer.name),
+                        )
+                    }
+                return result ?: getMove(withDatabaseConnection = true, withAi = true)
             }
         }
         return readlnOrNull()
@@ -223,7 +258,16 @@ class Game private constructor(
                         board.board.flatten().find {
                             it.position == destinationPosition
                         }
-                    if (!leadsToCheck(piece, destinationPiece, checkPieceMoves = true)) return false
+                    if (!leadsToCheck(
+                            piece,
+                            destinationPiece,
+                            checkPieceMoves = true,
+                            currentPlayer = currentPlayer,
+                            otherPlayer = otherPlayer,
+                        )
+                    ) {
+                        return false
+                    }
                 }
             }
         }
@@ -231,10 +275,12 @@ class Game private constructor(
         return true
     }
 
-    private fun leadsToCheck(
+    fun leadsToCheck(
         selectedPiece: Piece,
         destinationPiece: Piece? = null,
         checkPieceMoves: Boolean,
+        currentPlayer: Player,
+        otherPlayer: Player,
     ): Boolean {
         val kingPosition =
             if (selectedPiece.pieceType.name.contains("king")) {
@@ -252,12 +298,12 @@ class Game private constructor(
                 selectedPiece.saveState()
                 destinationPiece.saveState()
 
-                currentPlayer.setSelectedPiece(selectedPiece)
-                currentPlayer.setDestinationPiece(destinationPiece)
+                currentPlayer.setSelectedPiece(selectedPiece, false)
+                currentPlayer.setDestinationPiece(destinationPiece, false)
 
-                updatePlayerPieces()
+                updatePlayerPieces(currentPlayer, logging = false)
                 otherPlayer.setLostPieces(currentPlayer.destinationPiece)
-                updateDestinationPiece()
+                updateDestinationPiece(currentPlayer)
                 updateAllOpenMoves(currentPlayer, otherPlayer)
 
                 return otherPlayer.allOpenMoves.contains(kingPosition).also {
@@ -276,8 +322,11 @@ class Game private constructor(
         }
     }
 
-    private fun updatePlayerPieces() {
-        currentPlayer.updateOwnPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
+    private fun updatePlayerPieces(
+        currentPlayer: Player,
+        logging: Boolean = true,
+    ) {
+        currentPlayer.updateOwnPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece, logging)
     }
 
     private fun updateScores() {
@@ -293,7 +342,7 @@ class Game private constructor(
         }
     }
 
-    private fun updateDestinationPiece() {
+    private fun updateDestinationPiece(currentPlayer: Player) {
         // update destination piece to empty
         currentPlayer.destinationPiece?.makeEmpty()
         // update destination piece location
@@ -387,6 +436,7 @@ class Game private constructor(
             pickedPlayer: Player,
             otherPlayer: Player,
             withDatabaseConnection: Boolean = false,
+            withAi: Boolean = false,
         ) {
             currentGame = Game(pickedPlayer, otherPlayer)
             if (withDatabaseConnection) {
@@ -400,9 +450,11 @@ class Game private constructor(
                         }
                     }
                 chessDataDAO = connection?.let { ChessDataDAO(it) }
-                neuralNetworkImplementation = connection?.let { NeuralNetworkImplementation(it) }
+                if (withAi) {
+                    neuralNetworkImplementation = connection?.let { NeuralNetworkImplementation(it) }
+                }
             }
-            currentGame?.start(withDatabaseConnection)
+            currentGame?.start(withDatabaseConnection, withAi)
         }
 
         fun getCurrentGame(): Game? {

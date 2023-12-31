@@ -29,7 +29,7 @@ data class BlackPlayer(
             BlackPlayer(
                 name,
                 playerPoints,
-                ownPieces.map { it.copy() }.toSet(),
+                ownPieces.map { piece -> piece.copy().also { it.saveState() } }.toSet(),
                 wonPieces.map { it.copy() }.toSet(),
                 lostPieces.map { it.copy() }.toSet(),
                 selectedPiece?.copy(),
@@ -39,13 +39,13 @@ data class BlackPlayer(
     }
 
     override fun restoreState() {
-        playerPoints = previousState?.playerPoints ?: 0
-        ownPieces = previousState?.ownPieces?.map { it.copy() }?.toSet() ?: emptySet()
-        wonPieces = previousState?.wonPieces?.map { it.copy() }?.toSet() ?: emptySet()
-        lostPieces = previousState?.lostPieces?.map { it.copy() }?.toSet() ?: emptySet()
-        selectedPiece = previousState?.selectedPiece?.copy()
-        destinationPiece = previousState?.destinationPiece?.copy()
-        allOpenMoves = previousState?.allOpenMoves?.map { it.copy() }?.toList() ?: emptyList()
+        playerPoints = this.previousState?.playerPoints ?: 0
+        ownPieces = this.previousState?.ownPieces?.map { piece -> piece.copy().also { it.restoreState() } }?.toSet() ?: emptySet()
+        wonPieces = this.previousState?.wonPieces?.map { it.copy() }?.toSet() ?: emptySet()
+        lostPieces = this.previousState?.lostPieces?.map { it.copy() }?.toSet() ?: emptySet()
+        selectedPiece = this.previousState?.selectedPiece?.copy()
+        destinationPiece = this.previousState?.destinationPiece?.copy()
+        allOpenMoves = this.previousState?.allOpenMoves?.map { it.copy() }?.toList() ?: emptyList()
     }
 
     override fun defaultPieces(): MutableList<MutableList<Piece>> {
@@ -226,13 +226,18 @@ data class BlackPlayer(
     override fun updateOwnPieces(
         selectedPiece: Piece?,
         destinationPiece: Piece?,
+        logging: Boolean,
     ) {
         if (selectedPiece == null) {
-            fancyPrintln("selected piece is null. Can't update own pieces.")
+            if (logging) {
+                fancyPrintln("selected piece is null. Can't update own pieces.")
+            }
             return
         }
         if (destinationPiece == null) {
-            fancyPrintln("destination piece is null. Can't update own pieces.")
+            if (logging) {
+                fancyPrintln("destination piece is null. Can't update own pieces.")
+            }
             return
         }
         val selectedPiecePosition = selectedPiece.position.copy()
@@ -276,23 +281,33 @@ data class BlackPlayer(
         return allOpenMoves
     }
 
-    override fun setSelectedPiece(piece: Piece): Boolean {
+    override fun setSelectedPiece(
+        piece: Piece,
+        logging: Boolean,
+    ): Boolean {
         if (getOwnPiecePositions().any { it == piece.position.toString() || it == piece.position.toString() + "k" }) {
             selectedPiece = piece
             return true
         }
-        fancyPrintln("${piece.position} is not your piece.")
+        if (logging) {
+            fancyPrintln("${piece.position} is not your piece.")
+        }
         selectedPiece = null
         return false
     }
 
-    override fun setDestinationPiece(piece: Piece): Boolean {
+    override fun setDestinationPiece(
+        piece: Piece,
+        logging: Boolean,
+    ): Boolean {
         val selectedPiece = selectedPiece ?: return false
         if (selectedPiece.openMoves.any { position -> position.toString().contains(piece.position.toString()) }) {
             destinationPiece = piece
             return true
         }
-        fancyPrintln("${piece.position} is not a valid move.")
+        if (logging) {
+            fancyPrintln("${piece.position} is not a valid move.")
+        }
         destinationPiece = null
         return false
     }

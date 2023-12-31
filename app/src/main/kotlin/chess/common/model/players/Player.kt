@@ -26,6 +26,7 @@ interface Player {
     fun updateOwnPieces(
         selectedPiece: Piece?,
         destinationPiece: Piece?,
+        logging: Boolean = true,
     )
 
     fun updateAllOpenMoves(
@@ -38,9 +39,15 @@ interface Player {
         otherPlayerAllOpenPieces: List<Position>,
     ): List<Position>
 
-    fun setSelectedPiece(piece: Piece): Boolean
+    fun setSelectedPiece(
+        piece: Piece,
+        logging: Boolean = true,
+    ): Boolean
 
-    fun setDestinationPiece(piece: Piece): Boolean
+    fun setDestinationPiece(
+        piece: Piece,
+        logging: Boolean = true,
+    ): Boolean
 
     fun setWonPieces()
 

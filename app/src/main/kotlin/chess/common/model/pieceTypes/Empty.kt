@@ -15,4 +15,8 @@ data class Empty(
     ): Set<Position> {
         return emptySet()
     }
+
+    override fun copy(): Empty {
+        return Empty(name, point, image)
+    }
 }

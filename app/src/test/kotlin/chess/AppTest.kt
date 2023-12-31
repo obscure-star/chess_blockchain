@@ -50,7 +50,7 @@ class AppTest {
 
     @Test
     fun `black checkmates in 3 moves`() {
-        provideInput("white d", "f2-f4", "e7-e6", "g2-g4", "d8-h4", "q", "q")
+        provideInput("white", "f2-f4", "e7-e6", "g2-g4", "d8-h4", "q", "q")
 
         main()
 
@@ -233,7 +233,7 @@ class AppTest {
     @Test
     fun `Kasparov (white) vs Topalov (black), Wijk aan Zee 1999 game play test`() {
         provideInput(
-            "white d",
+            "white",
             "e2-e4",
             "d7-d6",
             "d2-d4",

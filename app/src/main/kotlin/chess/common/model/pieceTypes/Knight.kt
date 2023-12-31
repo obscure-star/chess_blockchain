@@ -46,4 +46,8 @@ data class Knight(
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
+
+    override fun copy(): Knight {
+        return Knight(name, point, image)
+    }
 }

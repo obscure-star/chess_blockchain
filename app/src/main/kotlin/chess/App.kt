@@ -24,11 +24,14 @@ fun main() {
             fancyPrintln("You will be playing as $inputPlayer")
             startGame(inputPlayer!!)
         } else {
-            val sanitizedInput = inputPlayer?.replace(Regex("^(white|black)\\sd\\b", RegexOption.IGNORE_CASE), "$1") ?: ""
+            val databaseFlag = inputPlayer?.matches(Regex("^(white|black)\\sd\\b", RegexOption.IGNORE_CASE))
+            val aiFlag = inputPlayer?.matches(Regex("^(white|black)\\sa\\b", RegexOption.IGNORE_CASE))
+            val sanitizedInput = inputPlayer?.replace(Regex("^(white|black)\\s[da]\\b", RegexOption.IGNORE_CASE), "$1") ?: ""
 
-            if (sanitizedInput.isNotEmpty()) {
+            if (sanitizedInput.isNotEmpty() && sanitizedInput == "white" || sanitizedInput == "black") {
                 fancyPrintln("You will be playing as $sanitizedInput")
-                startGame(sanitizedInput, true)
+                if (databaseFlag == true) startGame(sanitizedInput, withDatabaseConnection = true)
+                if (aiFlag == true) startGame(sanitizedInput, withDatabaseConnection = true, withAi = true)
             } else {
                 fancyPrintln("Invalid input. Please enter (white/black).")
             }
@@ -39,6 +42,7 @@ fun main() {
 fun startGame(
     player: String,
     withDatabaseConnection: Boolean = false,
+    withAi: Boolean = false,
 ) {
     if (player == "white") {
         Game.startNewGame(
@@ -53,6 +57,7 @@ fun startGame(
                     playerPoints = 0,
                 ),
             withDatabaseConnection,
+            withAi,
         )
     } else {
         Game.startNewGame(
@@ -67,6 +72,7 @@ fun startGame(
                     playerPoints = 0,
                 ),
             withDatabaseConnection,
+            withAi,
         )
     }
 }

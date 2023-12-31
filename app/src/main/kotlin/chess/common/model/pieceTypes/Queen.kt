@@ -61,4 +61,8 @@ data class Queen(
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
+
+    override fun copy(): Queen {
+        return Queen(name, point, image)
+    }
 }

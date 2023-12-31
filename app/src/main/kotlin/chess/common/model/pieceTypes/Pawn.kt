@@ -59,4 +59,8 @@ data class Pawn(
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
+
+    override fun copy(): Pawn {
+        return Pawn(name, point, image)
+    }
 }

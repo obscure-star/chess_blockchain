@@ -1,8 +1,6 @@
 package chess.mlmodels
 
 import chess.mlmodels.dataframes.DataProcessing
-import chess.mlmodels.dataframes.LegalMoves
-import kotlinx.serialization.json.Json
 import org.deeplearning4j.datasets.iterator.utilty.ListDataSetIterator
 import org.deeplearning4j.nn.api.OptimizationAlgorithm
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration
@@ -33,7 +31,7 @@ class NeuralNetworkImplementation(val connection: Connection) {
         buildModel()
     }
 
-    private fun buildModel() {
+    fun buildModel() {
         // Data Processing
         val data = processRecords()
         val features = data.first
@@ -171,7 +169,13 @@ class NeuralNetworkImplementation(val connection: Connection) {
         return nextMoveIndex
     }
 
-    fun predictMove(aiPlayerName: String): String {
+    fun predictMove(
+        aiPlayerName: String,
+        legalMoves: MutableList<String>?,
+    ): String {
+        if (legalMoves?.size == 1) {
+            return legalMoves[0]
+        }
         // get legal moves of the last row
         val data = connection.createStatement().executeQuery("SELECT * FROM Chess_database.CHESS_DATA ORDER BY ID DESC LIMIT 1;")
 
@@ -182,11 +186,11 @@ class NeuralNetworkImplementation(val connection: Connection) {
         features.add(getFeatureRow(data))
         labels.add(getLabel(data))
 
-        val nextMove = data.getString("NEXT_MOVE")
-        val legalMoves =
-            Json.decodeFromString<LegalMoves>(data.getString("LEGAL_MOVES")).getLegalMoves(aiPlayerName).filter {
-                "${it[0]}${it[1]}" != "${nextMove[3]}${nextMove[4]}"
-            }
+        // val nextMove = data.getString("NEXT_MOVE")
+        // val legalMoves =
+        //    Json.decodeFromString<LegalMoves>(data.getString("LEGAL_MOVES")).getLegalMoves(aiPlayerName).filter {
+        //        "${it[0]}${it[1]}" != "${nextMove[3]}${nextMove[4]}"
+        //    }
 
         val featuresMatrix = Nd4j.create(features.toTypedArray())
         val labelsMatrix = Nd4j.create(labels)
@@ -202,14 +206,20 @@ class NeuralNetworkImplementation(val connection: Connection) {
         val predictedIndex = predictedLabelsOriginal.lastOrNull()?.toInt()
 
         // Check if the index is within the valid range
-        if (predictedIndex != null && predictedIndex >= 0 && predictedIndex < legalMoves.size) {
-            return legalMoves[predictedIndex]
-        } else {
-            // Handle the case where the index is out of bounds
-            println("Invalid predicted index: $predictedIndex")
-            // rebuild model then predict
-            buildModel()
-            return predictMove(aiPlayerName)
+        if (predictedIndex != null && predictedIndex in 0 until (legalMoves?.size ?: 0)) {
+            return legalMoves?.get(predictedIndex) ?: run {
+                // Handle the case where the index is out of bounds
+                println("Invalid predicted index: $predictedIndex")
+                // Rebuild model and then predict
+                buildModel()
+                return predictMove(aiPlayerName, legalMoves)
+            }
         }
+
+        // Handle the case where the index is out of bounds
+        println("Invalid predicted index: $predictedIndex")
+        // Rebuild model and then predict
+        buildModel()
+        return predictMove(aiPlayerName, legalMoves)
     }
 }

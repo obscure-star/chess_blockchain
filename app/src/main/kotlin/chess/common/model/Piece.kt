@@ -17,7 +17,7 @@ data class Piece(
         previousState =
             Piece(
                 name = name,
-                pieceType = pieceType,
+                pieceType = pieceType.copy(),
                 initialPosition = initialPosition.copy(),
                 position = position.copy(),
                 openMoves = openMoves.map { it.copy() }.toSet(),

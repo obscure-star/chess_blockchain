@@ -106,4 +106,8 @@ data class King(
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
+
+    override fun copy(): King {
+        return King(name, point, image, castleRookPositions.map { it.copy() }.toMutableList(), canCastle)
+    }
 }

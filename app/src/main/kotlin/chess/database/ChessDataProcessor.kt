@@ -9,6 +9,7 @@ import chess.common.model.pieceTypes.King
 import chess.common.model.pieceTypes.Pawn
 import chess.common.model.players.Player
 import chess.toColumn
+import chess.toColumnNumber
 
 class ChessDataProcessor(
     val game: Game,
@@ -70,16 +71,30 @@ class ChessDataProcessor(
     private fun evaluateLegalMoves(): MutableMap<String, MutableList<String>> {
         val output = mutableMapOf(currentPlayer.name to mutableListOf<String>(), otherPlayer.name to mutableListOf())
 
-        fun addMovesToOutput(player: Player) {
+        fun addMovesToOutput(
+            player: Player,
+            otherPlayer: Player,
+        ) {
             for (piece in player.ownPieces) {
                 for (move in piece.openMoves) {
-                    output[player.name]?.add("${piece.position}-${move.toStringWithoutP()}")
+                    // check if leads to check
+                    val destinationPiece = board.board[8 - move.row][move.column.toColumnNumber()]
+                    if (!game.leadsToCheck(
+                            piece,
+                            destinationPiece,
+                            checkPieceMoves = true,
+                            currentPlayer = player,
+                            otherPlayer = otherPlayer,
+                        )
+                    ) {
+                        output[player.name]?.add("${piece.position}-${move.toStringWithoutP()}")
+                    }
                 }
             }
         }
 
-        addMovesToOutput(currentPlayer)
-        addMovesToOutput(otherPlayer)
+        addMovesToOutput(currentPlayer, otherPlayer)
+        addMovesToOutput(otherPlayer, currentPlayer)
 
         return output
     }

@@ -53,4 +53,8 @@ data class Rook(
         // fancyPrintln("These are the valid positions: $validPositions")
         return validPositions
     }
+
+    override fun copy(): Rook {
+        return Rook(name, point, image, canCastle)
+    }
 }

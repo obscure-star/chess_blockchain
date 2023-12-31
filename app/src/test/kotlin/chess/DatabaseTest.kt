@@ -7,6 +7,7 @@ import chess.common.model.Game
 import chess.common.model.players.BlackPlayer
 import chess.common.model.players.WhitePlayer
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
@@ -637,6 +638,153 @@ class DatabaseTest {
         assertEquals(
             "black_king",
             board[0][5].name,
+        )
+    }
+
+    @Test
+    fun `castle move database`() {
+        provideInput(
+            "white d",
+            "d2-d4",
+            "d7-d5",
+            "c1-g5",
+            "h7-h6",
+            "b1-c3",
+            "b8-c6",
+            "d1-d2",
+            "g8-f6",
+            "e1-c1",
+            "d8-d6",
+            "d1-e1",
+            "q",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        Assertions.assertTrue(game?.firstPlayer is WhitePlayer)
+        Assertions.assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+        val pieceFinalPosition = game.firstPlayer.selectedPiece!!.position
+        val pieceInitialPosition = game.firstPlayer.destinationPiece!!.position
+
+        assertEquals(
+            "white_rook",
+            board[
+                8 - pieceFinalPosition.row,
+            ][pieceFinalPosition.column.toColumnNumber()].name,
+        )
+        assertEquals(
+            "empty",
+            board[8 - pieceInitialPosition.row][pieceInitialPosition.column.toColumnNumber()].name,
+        )
+    }
+
+    @Test
+    fun `Anastasia Bodnaruk (white) vs Anastasia Savina (black), (black wins)`() {
+        provideInput(
+            "white d",
+            "e2-e4",
+            "c7-c5",
+            "c2-c4",
+            "b8-c6",
+            "b1-c3",
+            "g7-g6",
+            "g2-g3",
+            "f8-g7",
+            "f1-g2",
+            "d7-d6",
+            "h2-h3",
+            "e7-e6",
+            "g1-e2",
+            "g8-e7",
+            "e1-g1",
+            "e8-g8",
+            "d2-d3",
+            "a8-b8",
+            "c1-e3",
+            "c6-d4",
+            "a1-b1",
+            "b7-b6",
+            "f2-f4",
+            "c8-b7",
+            "e3-f2",
+            "e7-c6",
+            "a2-a3",
+            "d8-d7",
+            "g1-h1",
+            "b8-e8",
+            "b2-b4",
+            "b7-a8",
+            "b4-b5",
+            "c6-e7",
+            "h1-h2",
+            "g8-h8",
+            "d1-d2",
+            "d6-d5",
+            "c4-d5",
+            "e6-d5",
+            "e4-e5",
+            "d4-e6",
+            "d3-d4",
+            "f7-f6",
+            "b1-d1",
+            "f6-e5",
+            "d4-e5",
+            "d5-d4",
+            "g2-a8",
+            "e8-a8",
+            "a3-a4",
+            "d7-b7",
+            "c3-b1",
+            "a7-a6",
+            "d2-d3",
+            "a6-b5",
+            "a4-b5",
+            "g6-g5",
+            "f2-g1",
+            "g5-f4",
+            "g3-f4",
+            "e6-f4",
+            "f1-f4",
+            "g7-e5",
+            "d1-f1",
+            "e7-g6",
+            "d3-g3",
+            "b7-c7",
+            "g3-g2",
+            "g6-f4",
+            "e2-f4",
+            "e5-f4",
+            "h2-h1",
+            "a8-e8",
+            "b1-a3",
+            "f8-g8",
+            "g2-d5",
+            "e8-e2",
+            "g1-f2",
+            "f4-e3",
+            "d5-f3",
+            "c7-g7",
+            "f2-e3",
+            "e2-e3",
+            "q",
+            "q",
+        )
+
+        main()
+
+        val game = Game.getCurrentGame()
+        assertTrue(game?.firstPlayer is WhitePlayer)
+        assertTrue(game?.secondPlayer is BlackPlayer)
+
+        val board = game!!.board.board
+
+        assertEquals(
+            "black_king",
+            board[0][7].name,
         )
     }
 

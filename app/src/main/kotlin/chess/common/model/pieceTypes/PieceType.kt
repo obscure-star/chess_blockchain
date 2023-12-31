@@ -13,4 +13,6 @@ interface PieceType {
         otherPlayerPiecePositions: List<String>,
         otherPlayerAllOpenMoves: List<Position>,
     ): Set<Position>
+
+    fun copy(): PieceType
 }
