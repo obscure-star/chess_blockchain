@@ -300,8 +300,12 @@ data class WhitePlayer(
         piece: Piece,
         logging: Boolean,
     ): Boolean {
-        val selectedPiece = selectedPiece ?: return false
-        if (selectedPiece.openMoves.any { position -> position.toString().contains(piece.position.toString()) }) {
+        if (selectedPiece != null &&
+            selectedPiece!!.openMoves.any {
+                    position ->
+                position.toString().contains(piece.position.toString())
+            }
+        ) {
             destinationPiece = piece
             return true
         }

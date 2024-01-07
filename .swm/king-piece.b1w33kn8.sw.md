@@ -110,7 +110,10 @@ This code snippet defines a `King` data class that represents a king piece in a 
 106            // fancyPrintln("These are the valid positions: $validPositions")
 107            return validPositions
 108        }
-109    }
+109    
+110        override fun copy(): King {
+111            return King(name, point, image, castleRookPositions.map { it.copy() }.toMutableList(), canCastle)
+112        }
 ```
 
 <br/>

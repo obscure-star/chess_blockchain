@@ -37,7 +37,7 @@ data class Pawn(
                 if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
                     if (isKill(newCol, newRow, colOffset, rowOffset)) {
                         validPositions.add(Position(newRow, newCol.toColumn()))
-                    } else if (abs(colOffset) != abs(rowOffset)) {
+                    } else if (abs(colOffset) != abs(rowOffset) && !otherPlayerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
                         validPositions.add(Position(newRow, newCol.toColumn(), true))
                     }
                 }
