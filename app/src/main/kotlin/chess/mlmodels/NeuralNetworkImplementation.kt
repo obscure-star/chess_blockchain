@@ -81,19 +81,19 @@ class NeuralNetworkImplementation(val connection: Connection) {
                 .layer(
                     DenseLayer.Builder()
                         .nIn(featuresMatrix.columns())
-                        .nOut(2048)
+                        .nOut(4096)
                         .build(),
                 )
                 .layer(
                     DenseLayer.Builder()
-                        .nIn(2048)
-                        .nOut(1024)
+                        .nIn(4096)
+                        .nOut(2048)
                         .build(),
                 )
                 .layer(
                     OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .activation(Activation.SOFTMAX)
-                        .nIn(1024)
+                        .nIn(2048)
                         .nOut(labelMap.size) // Number of classes
                         .build(),
                 )
