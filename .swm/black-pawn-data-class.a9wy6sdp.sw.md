@@ -1,71 +1,75 @@
 ---
-id: a9wy6sdp
 title: Black pawn data class
-file_version: 1.1.3
-app_version: 1.18.32
+---
+<SwmSnippet path="/app/src/main/kotlin/chess/common/model/pieceTypes/BlackPawn.kt" line="8">
+
 ---
 
-This code snippet defines a data class `BlackPawn` that represents a black pawn piece in a chess game. It implements the `PieceType` interface and overrides its functions. The `movePattern` function calculates the valid positions that the black pawn can move to based on its current position and the positions of other pieces on the board. It checks for standard pawn moves, double moves on the pawn's initial position, and captures diagonally. The valid positions are returned as a set of `Position` objects.
-<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
-### 📄 app/src/main/kotlin/chess/common/model/pieceTypes/BlackPawn.kt
+This code snippet defines a data class <SwmToken path="/app/src/main/kotlin/chess/common/model/pieceTypes/BlackPawn.kt" pos="8:4:4" line-data="data class BlackPawn(">`BlackPawn`</SwmToken> that represents a black pawn piece in a chess game. It implements the <SwmToken path="/app/src/main/kotlin/chess/common/model/pieceTypes/BlackPawn.kt" pos="12:4:4" line-data=") : PieceType {">`PieceType`</SwmToken> interface and overrides its functions. The <SwmToken path="/app/src/main/kotlin/chess/common/model/pieceTypes/BlackPawn.kt" pos="13:5:5" line-data="    override fun movePattern(">`movePattern`</SwmToken> function calculates the valid positions that the black pawn can move to based on its current position and the positions of other pieces on the board. It checks for standard pawn moves, double moves on the pawn's initial position, and captures diagonally. The valid positions are returned as a set of <SwmToken path="/app/src/main/kotlin/chess/common/model/pieceTypes/BlackPawn.kt" pos="14:1:1" line-data="        position: Position,">`position`</SwmToken> objects.
+
 ```kotlin
-8      data class BlackPawn(
-9          override val name: String = "black_pawn",
-10         override val point: Int = 1,
-11         override val image: String = " P ",
-12     ) : PieceType {
-13         override fun movePattern(
-14             position: Position,
-15             playerPiecePositions: List<String>,
-16             otherPlayerPiecePositions: List<String>,
-17             otherPlayerAllOpenMoves: List<Position>,
-18         ): Set<Position> {
-19             val validPositions = mutableSetOf<Position>()
-20     
-21             fun isKill(
-22                 newCol: Int,
-23                 newRow: Int,
-24                 colOffset: Int,
-25                 rowOffset: Int,
-26             ): Boolean {
-27                 return (abs(colOffset) == abs(rowOffset) && otherPlayerPiecePositions.contains("${newCol.toColumn()}$newRow"))
-28             }
-29     
-30             fun addIfValid(
-31                 colOffset: Int,
-32                 rowOffset: Int,
-33             ) {
-34                 val newCol = position.column.toColumnNumber() + colOffset + 1
-35                 val newRow = position.row + rowOffset
-36                 if (newCol in 1..8 && newRow in 1..8) {
-37                     if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
-38                         if (isKill(newCol, newRow, colOffset, rowOffset)) {
-39                             validPositions.add(Position(newRow, newCol.toColumn()))
-40                         } else if (abs(colOffset) != abs(rowOffset)) {
-41                             validPositions.add(Position(newRow, newCol.toColumn(), true))
-42                         }
-43                     }
-44                 }
-45             }
-46     
-47             // Pawn moves forward
-48             addIfValid(0, -1)
-49     
-50             // Pawn's initial double move
-51             if (position.row == 7) {
-52                 addIfValid(0, -2)
-53             }
-54     
-55             // Pawn captures diagonally
-56             addIfValid(-1, -1)
-57             addIfValid(1, -1)
-58     
-59             // fancyPrintln("These are the valid positions: $validPositions")
-60             return validPositions
-61         }
-62     }
+data class BlackPawn(
+    override val name: String = "black_pawn",
+    override val point: Int = 1,
+    override val image: String = " P ",
+) : PieceType {
+    override fun movePattern(
+        position: Position,
+        playerPiecePositions: List<String>,
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenMoves: List<Position>,
+    ): Set<Position> {
+        val validPositions = mutableSetOf<Position>()
+
+        fun isKill(
+            newCol: Int,
+            newRow: Int,
+            colOffset: Int,
+            rowOffset: Int,
+        ): Boolean {
+            return (abs(colOffset) == abs(rowOffset) && otherPlayerPiecePositions.contains("${newCol.toColumn()}$newRow"))
+        }
+
+        fun addIfValid(
+            colOffset: Int,
+            rowOffset: Int,
+        ) {
+            val newCol = position.column.toColumnNumber() + colOffset + 1
+            val newRow = position.row + rowOffset
+            if (newCol in 1..8 && newRow in 1..8) {
+                if (!playerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
+                    if (isKill(newCol, newRow, colOffset, rowOffset)) {
+                        validPositions.add(Position(newRow, newCol.toColumn()))
+                    } else if (abs(colOffset) != abs(rowOffset) && !otherPlayerPiecePositions.contains("${newCol.toColumn()}$newRow")) {
+                        validPositions.add(Position(newRow, newCol.toColumn(), true))
+                    }
+                }
+            }
+        }
+
+        // Pawn moves forward
+        addIfValid(0, -1)
+
+        // Pawn's initial double move
+        if (position.row == 7) {
+            addIfValid(0, -2)
+        }
+
+        // Pawn captures diagonally
+        addIfValid(-1, -1)
+        addIfValid(1, -1)
+
+        // fancyPrintln("These are the valid positions: $validPositions")
+        return validPositions
+    }
+
+    override fun copy(): BlackPawn {
+        return BlackPawn(name, point, image)
+    }
 ```
 
-<br/>
+---
 
-This file was generated by Swimm. [Click here to view it in the app](https://app.swimm.io/repos/Z2l0aHViJTNBJTNBQ2hlc3MlM0ElM0FvYnNjdXJlLXN0YXI=/docs/a9wy6sdp).
+</SwmSnippet>
+
+<SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBQ2hlc3MlM0ElM0FvYnNjdXJlLXN0YXI=" repo-name="Chess"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>

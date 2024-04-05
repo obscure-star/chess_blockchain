@@ -1,109 +1,120 @@
 ---
-id: r0uqtz9w
 title: Piece data class
-file_version: 1.1.3
-app_version: 1.18.32
+---
+<SwmSnippet path="/app/src/main/kotlin/chess/common/model/Piece.kt" line="7">
+
 ---
 
 This code snippet defines a `Piece` data class that represents a game piece. It has properties such as `name`, `pieceType`, `initialPosition`, `position`, `openMoves`, and `color`. The class provides various functions to manipulate and update these properties, such as `setOpenMoves`, `getInstanceOpenMoves`, `clearOpenMoves`, `makeEmpty`, and `updatePosition`.
-<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
-### 📄 app/src/main/kotlin/chess/common/model/Piece.kt
+
 ```kotlin
-7      data class Piece(
-8          var name: String = "empty",
-9          var pieceType: PieceType = Empty(),
-10         var initialPosition: Position = Position(1, "a"),
-11         var position: Position = Position(1, "a"),
-12         var openMoves: Set<Position> = emptySet(),
-13         var color: String = Color.WHITE.code,
-14         var previousState: Piece? = null,
-15     ) {
-16         fun saveState() {
-17             previousState =
-18                 Piece(
-19                     name = name,
-20                     pieceType = pieceType,
-21                     initialPosition = initialPosition.copy(),
-22                     position = position.copy(),
-23                     openMoves = openMoves.map { it.copy() }.toSet(),
-24                     color = color,
-25                 )
-26         }
-27     
-28         fun restoreState() {
-29             name = previousState?.name.toString()
-30             pieceType = previousState?.pieceType ?: Empty()
-31             initialPosition = previousState?.initialPosition ?: Position(1, "a")
-32             position = previousState?.position ?: Position(1, "a")
-33             openMoves = previousState?.openMoves?.map { it.copy() }?.toSet() ?: emptySet()
-34             color = previousState?.color ?: Color.WHITE.code
-35         }
-36     
-37         fun setOpenMoves(
-38             playerPiecePositions: List<String>,
-39             otherPlayerPiecePositions: List<String>,
-40             otherPlayerAllOpenMoves: List<Position>,
-41         ) {
-42             openMoves =
-43                 pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenMoves)
-44         }
-45     
-46         fun getInstanceOpenMoves(
-47             playerPiecePositions: List<String>,
-48             otherPlayerPiecePositions: List<String>,
-49             otherPlayerAllOpenPieces: List<Position>,
-50         ): Set<Position> {
-51             return pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
-52         }
-53     
-54         fun clearOpenMoves() {
-55             openMoves = emptySet()
-56         }
-57     
-58         fun makeEmpty() {
-59             name = "empty"
-60             pieceType = Empty()
-61             openMoves = emptySet()
-62             color = Color.WHITE.code
-63         }
-64     
-65         fun updatePosition(newPosition: Position) {
-66             position = newPosition
-67         }
-68     }
+data class Piece(
+    var name: String = "empty",
+    var pieceType: PieceType = Empty(),
+    var initialPosition: Position = Position(1, "a"),
+    var position: Position = Position(1, "a"),
+    var openMoves: Set<Position> = emptySet(),
+    var color: String = Color.WHITE.code,
+    var previousState: Piece? = null,
+) {
+    fun saveState() {
+        previousState =
+            Piece(
+                name = name,
+                pieceType = pieceType.copy(),
+                initialPosition = initialPosition.copy(),
+                position = position.copy(),
+                openMoves = openMoves.map { it.copy() }.toSet(),
+                color = color,
+            )
+    }
+
+    fun restoreState() {
+        name = previousState?.name.toString()
+        pieceType = previousState?.pieceType ?: Empty()
+        initialPosition = previousState?.initialPosition ?: Position(1, "a")
+        position = previousState?.position ?: Position(1, "a")
+        openMoves = previousState?.openMoves?.map { it.copy() }?.toSet() ?: emptySet()
+        color = previousState?.color ?: Color.WHITE.code
+    }
+
+    fun setOpenMoves(
+        playerPiecePositions: List<String>,
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenMoves: List<Position>,
+    ) {
+        openMoves =
+            pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenMoves)
+    }
+
+    fun getInstanceOpenMoves(
+        playerPiecePositions: List<String>,
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
+    ): Set<Position> {
+        return pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
+    }
+
+    fun clearOpenMoves() {
+        openMoves = emptySet()
+    }
+
+    fun makeEmpty() {
+        name = "empty"
+        pieceType = Empty()
+        openMoves = emptySet()
+        color = Color.WHITE.code
+    }
+
+    fun updatePosition(newPosition: Position) {
+        position = newPosition
+    }
+}
 ```
 
-<br/>
+---
+
+</SwmSnippet>
+
+<SwmSnippet path="/app/src/main/kotlin/chess/common/model/Piece.kt" line="37">
+
+---
 
 This code snippet sets the `openMoves` variable by calling a `movePattern` function with certain arguments.
-<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
-### 📄 app/src/main/kotlin/chess/common/model/Piece.kt
+
 ```kotlin
-37         fun setOpenMoves(
-38             playerPiecePositions: List<String>,
-39             otherPlayerPiecePositions: List<String>,
-40             otherPlayerAllOpenMoves: List<Position>,
-41         ) {
-42             openMoves =
-43                 pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenMoves)
-44         }
+    fun setOpenMoves(
+        playerPiecePositions: List<String>,
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenMoves: List<Position>,
+    ) {
+        openMoves =
+            pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenMoves)
+    }
 ```
 
-<br/>
+---
+
+</SwmSnippet>
+
+<SwmSnippet path="/app/src/main/kotlin/chess/common/model/Piece.kt" line="46">
+
+---
 
 This code snippet defines a function `getInstanceOpenMoves` which takes in several lists as arguments. It returns a set of positions based on a move pattern determined by the `pieceType`.
-<!-- NOTE-swimm-snippet: the lines below link your snippet to Swimm -->
-### 📄 app/src/main/kotlin/chess/common/model/Piece.kt
+
 ```kotlin
-24         fun getInstanceOpenMoves(
-25             playerPiecePositions: List<String>,
-26             otherPlayerPiecePositions: List<String>,
-27             otherPlayerAllOpenPieces: List<Position>,
-28         ): Set<Position> {
-29             return pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
-30         }
+    fun getInstanceOpenMoves(
+        playerPiecePositions: List<String>,
+        otherPlayerPiecePositions: List<String>,
+        otherPlayerAllOpenPieces: List<Position>,
+    ): Set<Position> {
+        return pieceType.movePattern(position, playerPiecePositions, otherPlayerPiecePositions, otherPlayerAllOpenPieces)
+    }
 ```
 
-<br/>
+---
 
-This file was generated by Swimm. [Click here to view it in the app](https://app.swimm.io/repos/Z2l0aHViJTNBJTNBQ2hlc3MlM0ElM0FvYnNjdXJlLXN0YXI=/docs/r0uqtz9w).
+</SwmSnippet>
+
+<SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBQ2hlc3MlM0ElM0FvYnNjdXJlLXN0YXI=" repo-name="Chess"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>
