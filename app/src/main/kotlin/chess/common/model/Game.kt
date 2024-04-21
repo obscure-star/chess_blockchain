@@ -14,6 +14,8 @@ import chess.database.SQLConnection
 import chess.fancyPrintln
 import chess.mlmodels.NeuralNetworkImplementation
 import chess.toColumnNumber
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.runBlocking
 import java.sql.Connection
 import java.util.UUID
@@ -349,9 +351,12 @@ class Game private constructor(
         currentPlayer.selectedPiece?.let { currentPlayer.destinationPiece?.updatePosition(it.initialPosition) }
     }
 
+    @OptIn(InternalCoroutinesApi::class)
     private fun updateBoard() {
-        fancyPrintln("Updating board.")
-        board.swapPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
+        synchronized(this) {
+            fancyPrintln("Updating board.")
+            board.swapPieces(currentPlayer.selectedPiece, currentPlayer.destinationPiece)
+        }
     }
 
     private fun processPromotePawn(

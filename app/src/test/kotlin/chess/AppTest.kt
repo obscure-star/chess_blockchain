@@ -478,7 +478,7 @@ class AppTest {
     @Test
     fun `Byrne (white) vs Fisher (black), New York 1956 (black wins)`() {
         provideInput(
-            "white",
+            "white d",
             "g1-f3",
             "g8-f6",
             "c2-c4",
